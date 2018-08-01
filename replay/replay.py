@@ -4,8 +4,8 @@ import re
 from typing import List, Tuple
 
 class Replay:
-    human_regex: str = r"H.*\n.*\n"
-    human_pattern = re.compile(human_regex)
+    player_regex: str = r"H.*\n.*\n"
+    player_pattern = re.compile(player_regex)
     action_regex: str = r"(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)"
     action_pattern = re.compile(action_regex)
     frame_regex: str = r"(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3}[A-z]*)"
@@ -33,24 +33,38 @@ class Replay:
         return dt.datetime.strptime(replay_data[7:21], cls.date_fmtstr)
 
     @classmethod
-    def _split_actions(cls, ln: str) -> List[str]:
-        return [x for x in cls.action_pattern.split(ln.rstrip()) if x]
+    def _split_frames(cls, ln: str) -> List[str]:
+        return
 
     @classmethod
-    def _split_frame(cls, ln: str) -> List[str]:
+    def _split_frame_from_action(cls, ln: str) -> List[str]:
         return [x for x in cls.frame_pattern.split(ln.rstrip()) if x]
 
     @classmethod
-    def get_actions(cls, replay_data: str) -> List[List[str]]:
+    def get_players(cls, replay_data: str) -> List[str]:
+        return cls.player_pattern.findall(replay_data)
+
+    @classmethod
+    def get_actions(cls, player_action_data: str) -> List[str]:
         return [
-            cls._split_actions(a) for a in [
-                h.split("\n")[1] for h in cls.human_pattern.findall(replay_data)
+            x for x in cls.action_pattern.split(player_action_data.rstrip()) if x
+        ]
+
+    @classmethod
+    def get_actions_all_players(cls, replay_data: str) -> List[List[str]]:
+        return [
+            cls.get_actions(player_action_data)
+            for player_action_data in [
+                player_data.split("\n")[1]
+                for player_data in cls.get_players(replay_data)
             ]
         ]
 
     @staticmethod
-    def get_duration(all_actions: List[List[str]]) -> dt.datetime:
+    def get_duration(actions_all_players: List[List[str]]) -> dt.datetime:
         return max([
-            max([int(re.findall(r"^\d+", a)[0]) for a in actions])
-            for actions in all_actions
+            max([
+                int(re.findall(r"^\d+", action)[0])
+                for action in actions_one_player])
+            for actions_one_player in actions_all_players
         ])
