@@ -8,6 +8,8 @@ class Replay:
     human_pattern = re.compile(human_regex)
     action_regex: str = r"(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)"
     action_pattern = re.compile(action_regex)
+    frame_regex: str = r"(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3}[A-z]*)"
+    frame_pattern = re.compile(frame_regex)
     date_fmtstr: str = "%H%M%S%d%m%Y"
 
     @staticmethod
@@ -35,13 +37,17 @@ class Replay:
         return [x for x in cls.action_pattern.split(ln.rstrip()) if x]
 
     @classmethod
+    def _split_frame(cls, ln: str) -> List[str]:
+        return [x for x in cls.frame_pattern.split(ln.rstrip()) if x]
+
+    @classmethod
     def get_actions(cls, replay_data: str) -> List[List[str]]:
         return [
             cls._split_actions(a) for a in [
                 h.split("\n")[1] for h in cls.human_pattern.findall(replay_data)
             ]
         ]
-    
+
     @staticmethod
     def get_duration(all_actions: List[List[str]]) -> dt.datetime:
         return max([
