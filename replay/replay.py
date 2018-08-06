@@ -33,14 +33,6 @@ class Replay:
         return dt.datetime.strptime(replay_data[7:21], cls.date_fmtstr)
 
     @classmethod
-    def _split_frames(cls, ln: str) -> List[str]:
-        return
-
-    @classmethod
-    def _split_frame_from_action(cls, ln: str) -> List[str]:
-        return [x for x in cls.frame_pattern.split(ln.rstrip()) if x]
-
-    @classmethod
     def get_players(cls, replay_data: str) -> List[str]:
         return cls.player_pattern.findall(replay_data)
 
