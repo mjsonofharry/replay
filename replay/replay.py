@@ -30,7 +30,7 @@ class Replay:
         return int(ln[1:3]), int(ln[3:5]), int(ln[5:7])
 
     @classmethod
-    def get_datetime(cls, replay_data: str) -> dt.datetime:
+    def get_date(cls, replay_data: str) -> dt.datetime:
         return dt.datetime.strptime(replay_data[7:21], cls.date_fmtstr)
 
     @classmethod
@@ -71,7 +71,7 @@ class Replay:
         }
     
     @staticmethod
-    def snap_to_lookup(lookup: Dict[int, str], n: int) -> str:
+    def snap_index_to_lookup(lookup: Dict[int, str], n: int) -> str:
         keys = list(lookup.keys())
         i = bs.bisect_right(keys, n)
         if i: return keys[i-1]
