@@ -1,7 +1,8 @@
+import bisect as bs
 import datetime as dt
 import os
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 class Replay:
     player_regex: str = r"H.*\n.*\n"
@@ -37,19 +38,17 @@ class Replay:
         return cls.player_pattern.findall(replay_data)
 
     @classmethod
-    def get_actions(cls, player_action_data: str) -> List[str]:
+    def get_actions(cls, player_data: str) -> List[str]:
         return [
-            x for x in cls.action_pattern.split(player_action_data.rstrip()) if x
+            x for x in 
+            cls.action_pattern.split(player_data.split("\n")[1].rstrip()) if x
         ]
 
     @classmethod
     def get_actions_all_players(cls, replay_data: str) -> List[List[str]]:
         return [
-            cls.get_actions(player_action_data)
-            for player_action_data in [
-                player_data.split("\n")[1]
-                for player_data in cls.get_players(replay_data)
-            ]
+            cls.get_actions(player_data) 
+            for player_data in cls.get_players(replay_data)
         ]
 
     @staticmethod
@@ -60,3 +59,20 @@ class Replay:
                 for action in actions_one_player])
             for actions_one_player in actions_all_players
         ])
+
+    @staticmethod
+    def get_lookup(action_data: str) -> Dict[int, str]:
+        return {
+            int(x[0]): x[1:] 
+            for x in [
+                [ a for a in Replay.frame_pattern.split(action) if a ]
+                for action in action_data
+            ]
+        }
+    
+    @staticmethod
+    def snap_to_lookup(lookup: Dict[int, str], n: int) -> str:
+        keys = list(lookup.keys())
+        i = bs.bisect_right(keys, n)
+        if i: return keys[i-1]
+        raise ValueError

@@ -33,13 +33,40 @@ def test_get_players():
     assert len(players) == 1
     assert players[0] == SAMPLE_PLAYER1_DATA
 
+def test_get_actions():
+    actions_player1 = Replay.get_actions(SAMPLE_PLAYER1_DATA)
+    assert len(actions_player1) == 717
+    assert actions_player1[0] == "1Z"
+    assert actions_player1[1] == "101zy327R"
+    assert actions_player1[-1] == "2385y  0"
+
 def test_actions_all_players():
     actions_all_players = Replay.get_actions_all_players(SAMPLE_REPLAY_DATA)
     assert len(actions_all_players) == 1
     actions_player1 = actions_all_players[0]
     assert len(actions_player1) == 717
     assert actions_player1[0] == "1Z"
+    assert actions_player1[1] == "101zy327R"
     assert actions_player1[-1] == "2385y  0"
 
 def test_get_duration():
     assert Replay.get_duration(Replay.get_actions_all_players(SAMPLE_REPLAY_DATA)) == 2385
+
+def test_get_lookup():
+    lookup_player1 = Replay.get_lookup(Replay.get_actions(SAMPLE_PLAYER1_DATA))
+    assert len(lookup_player1.keys()) == 717
+    assert lookup_player1[1] == ["Z"]
+    assert lookup_player1[101] == ["z", "y327R"]
+    assert lookup_player1[2385] == ["y  0"]
+
+def test_snap_to_lookup():
+    lookup_player1 = Replay.get_lookup(Replay.get_actions(SAMPLE_PLAYER1_DATA))
+    assert Replay.snap_to_lookup(lookup_player1, 1) == 1
+    assert Replay.snap_to_lookup(lookup_player1, 100) == 1
+    assert Replay.snap_to_lookup(lookup_player1, 101) == 101
+    assert Replay.snap_to_lookup(lookup_player1, 112) == 112
+    assert Replay.snap_to_lookup(lookup_player1, 114) == 112
+    assert Replay.snap_to_lookup(lookup_player1, 115) == 115
+    assert Replay.snap_to_lookup(lookup_player1, 118) == 115
+    assert Replay.snap_to_lookup(lookup_player1, 2385) == 2385
+    assert Replay.snap_to_lookup(lookup_player1, 9999) == 2385
