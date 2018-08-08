@@ -72,3 +72,12 @@ def test_snap_index_to_lookup():
     assert Replay.snap_index_to_lookup(lookup_p1, 118) == 115
     assert Replay.snap_index_to_lookup(lookup_p1, 2385) == 2385
     assert Replay.snap_index_to_lookup(lookup_p1, 9999) == 2385
+
+def test_snap_angle_to_eighth():
+    assert Replay.snap_angle_to_eighth(0) == 0
+    assert Replay.snap_angle_to_eighth(23) == 45
+    assert Replay.snap_angle_to_eighth(45) == 45
+    assert Replay.snap_angle_to_eighth(67) == 45
+    assert Replay.snap_angle_to_eighth(68) == 90
+    assert Replay.snap_angle_to_eighth(180) == 180
+    assert Replay.snap_angle_to_eighth(360) == 0
