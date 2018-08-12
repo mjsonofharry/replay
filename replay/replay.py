@@ -150,6 +150,7 @@ class Replay:
     
     @staticmethod
     def snap_angle_to_eighth(n):
+        if n < 0 or n > 360: raise ValueError
         result = min(
             [0, 45, 90, 135, 180, 225, 270, 315, 360],
             key=lambda x: abs(x - n))

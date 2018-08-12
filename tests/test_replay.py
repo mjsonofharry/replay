@@ -73,6 +73,10 @@ def test_snap_index_to_lookup():
     assert Replay.snap_index_to_lookup(lookup_p1, 2385) == 2385
     assert Replay.snap_index_to_lookup(lookup_p1, 9999) == 2385
 
+def test_snap_index_to_lookup_error():
+    lookup_p1 = Replay.get_lookup(Replay.get_actions(SAMPLE_PLAYER_DATA))
+    with pytest.raises(ValueError): Replay.snap_index_to_lookup(lookup_p1, -1)
+
 def test_snap_angle_to_eighth():
     assert Replay.snap_angle_to_eighth(0) == 0
     assert Replay.snap_angle_to_eighth(23) == 45
@@ -81,3 +85,7 @@ def test_snap_angle_to_eighth():
     assert Replay.snap_angle_to_eighth(68) == 90
     assert Replay.snap_angle_to_eighth(180) == 180
     assert Replay.snap_angle_to_eighth(360) == 0
+
+def test_snap_angle_to_eighth_error():
+    with pytest.raises(ValueError): Replay.snap_angle_to_eighth(-1)
+    with pytest.raises(ValueError): Replay.snap_angle_to_eighth(361)
