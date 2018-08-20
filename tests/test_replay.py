@@ -93,6 +93,11 @@ def test_snap_frame_error():
     lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
     with pytest.raises(ValueError): Replay.snap_frame(lookup_p1, -1)
 
+def test_snap_frame_transitive():
+    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
+    assert lookup_p1[Replay.snap_frame(lookup_p1, 100)] == ["Z"]
+    assert lookup_p1[Replay.snap_frame(lookup_p1, 101)] == ["z", "y327", "R"]
+
 def test_snap_angle():
     assert Replay.snap_angle(0) == 0
     assert Replay.snap_angle(23) == 45
