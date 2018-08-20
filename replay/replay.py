@@ -168,8 +168,6 @@ class Replay:
         self.name = self.get_name(replay_buffer)
         self.version = self.get_version(replay_buffer)
 
-        frames_all_players = self.get_frames_all_players(self.get_players(replay_buffer))
-        self.duration = self.get_duration(frames_all_players)
-        self.lookups = [
-            self.get_parsed_frame_lookup_table(x) for x in frames_all_players
-        ]
+        frames_all = self.get_frames_all_players(self.get_players(replay_buffer))
+        self.duration = self.get_duration(frames_all)
+        self.lookups = [self.get_parsed_frame_lookup_table(x) for x in frames_all]
