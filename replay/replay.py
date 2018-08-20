@@ -41,15 +41,15 @@ class Action(enum.IntEnum):
 class Replay:
     player_regex = r"H.*\n.*\n"
     player_pattern = re.compile(player_regex)
-    action_regex= r"(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)"
-    action_pattern = re.compile(action_regex)
-    frame_regex = r"(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})"
+    frame_regex= r"(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)"
     frame_pattern = re.compile(frame_regex)
+    action_regex = r"(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})"
+    action_pattern = re.compile(action_regex)
     date_fmtstr = "%H%M%S%d%m%Y"
 
     # Based on work by /u/MatthewMJV
     # Source: https://www.reddit.com/r/RivalsOfAether/comments/5sxvw2/what_i_have_learned_from_looking_through_replays/
-    token_action_lookup = {
+    action_lookup = {
         "J": Action.JUMP_PRESS,
         "j": Action.JUMP_RELEASE,
         "A": Action.ATTACK_PRESS,
@@ -85,78 +85,69 @@ class Replay:
     } 
 
     @staticmethod
-    def read_data(replay_file_path):
+    def read_replay_buffer(replay_file_path):
         fin = open(replay_file_path)
         data = fin.read()
         fin.close()
         return data
 
     @staticmethod
-    def get_name(replay_data):
-        return replay_data.split("\n", 1)[0].split(" ", 1)[0]
+    def get_name(replay_buffer):
+        return replay_buffer.split("\n", 1)[0].split(" ", 1)[0]
 
     @staticmethod
-    def get_version(replay_data):
-        ln = replay_data.split("\n", 1)[0]
+    def get_version(replay_buffer):
+        ln = replay_buffer.split("\n", 1)[0]
         return int(ln[1:3]), int(ln[3:5]), int(ln[5:7])
 
     @classmethod
-    def get_date(cls, replay_data):
-        return datetime.datetime.strptime(replay_data[7:21], cls.date_fmtstr)
+    def get_date(cls, replay_buffer):
+        return datetime.datetime.strptime(replay_buffer[7:21], cls.date_fmtstr)
 
     @classmethod
-    def get_players(cls, replay_data):
-        return cls.player_pattern.findall(replay_data)
+    def get_players(cls, replay_buffer):
+        return cls.player_pattern.findall(replay_buffer)
 
     @classmethod
-    def get_actions(cls, player_data):
+    def get_frames(cls, player_buffer):
         return [
             x for x in 
-            cls.action_pattern.split(player_data.split("\n")[1].rstrip()) if x
+            cls.frame_pattern.split(player_buffer.split("\n")[1].rstrip()) if x
         ]
 
     @classmethod
-    def get_actions_all_players(cls, replay_data):
-        return [
-            cls.get_actions(player_data) 
-            for player_data in cls.get_players(replay_data)
-        ]
+    def get_frames_all_players(cls, replay_buffer):
+        return [cls.get_frames(x) for x in cls.get_players(replay_buffer)]
 
     @staticmethod
-    def get_duration(actions_all_players):
+    def get_duration(frames_all_players):
         return max([
-            max([
-                int(re.findall(r"^\d+", action)[0])
-                for action in actions_one_player])
-            for actions_one_player in actions_all_players
+            max([int(re.findall(r"^\d+", x)[0]) for x in frames])
+            for frames in frames_all_players
         ])
 
     @staticmethod
-    def get_lookup(action_data):
-        return {
-            int(x[0]): x[1:] 
-            for x in [
-                [a for a in Replay.frame_pattern.split(action) if a]
-                for action in action_data
-            ]
-        }
+    def get_frame_lookup_table(frames):
+        frames_split = [
+            [a for a in Replay.action_pattern.split(x) if a] for x in frames
+        ]
+        return {int(x[0]): x[1:] for x in frames_split}
 
     @classmethod
-    def parse_lookup_entry(cls, entry):
+    def parse_frame(cls, frame):
         return [
-            cls.token_action_lookup[token] if token[0] != "y" else int(token[1:]) 
-            for token in entry
+            cls.action_lookup[x] if x[0] != "y" else int(x[1:]) for x in frame
         ]
     
     @staticmethod
-    def snap_index_to_lookup(lookup, n):
+    def snap_frame(lookup, n):
         keys = list(lookup.keys())
         i = bisect.bisect_right(keys, n)
         if i: return keys[i-1]
         raise ValueError
     
     @staticmethod
-    def snap_angle_to_eighth(n):
+    def snap_angle(n):
         if n < 0 or n > 360: raise ValueError
         result = min(
             [0, 45, 90, 135, 180, 225, 270, 315, 360],
