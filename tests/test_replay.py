@@ -77,6 +77,28 @@ def test_get_frame_lookup_table():
     assert lookup_p1[2384] == ["Z", "y180", "d"]
     assert lookup_p1[2366] == ["z", "D"]
 
+def test_convert_frame_tokens_to_actions():
+    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[1]) == [A.ANGLES_ENABLED]
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[101]) == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[148]) == [A.STRONG_PRESS]
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[154]) == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[1293]) == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[2385]) == [0]
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[2384]) == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
+    assert Replay.convert_frame_tokens_to_actions(lookup_p1[2366]) == [A.ANGLES_DISABLED, A.DOWN_PRESS]
+
+def test_get_parsed_frame_lookup_table():
+    lookup_p1 = Replay.get_parsed_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
+    assert lookup_p1[1] == [A.ANGLES_ENABLED]
+    assert lookup_p1[101] == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
+    assert lookup_p1[148] == [A.STRONG_PRESS]
+    assert lookup_p1[154] == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
+    assert lookup_p1[1293] == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
+    assert lookup_p1[2385] == [0]
+    assert lookup_p1[2384] == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
+    assert lookup_p1[2366] == [A.ANGLES_DISABLED, A.DOWN_PRESS]
+
 def test_snap_frame():
     lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
     assert Replay.snap_frame(lookup_p1, 1) == 1
@@ -110,14 +132,3 @@ def test_snap_angle():
 def test_snap_angle_error():
     with pytest.raises(ValueError): Replay.snap_angle(-1)
     with pytest.raises(ValueError): Replay.snap_angle(361)
-
-def test_parse_frame():
-    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
-    assert Replay.parse_frame(lookup_p1[1]) == [A.ANGLES_ENABLED]
-    assert Replay.parse_frame(lookup_p1[101]) == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
-    assert Replay.parse_frame(lookup_p1[148]) == [A.STRONG_PRESS]
-    assert Replay.parse_frame(lookup_p1[154]) == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
-    assert Replay.parse_frame(lookup_p1[1293]) == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
-    assert Replay.parse_frame(lookup_p1[2385]) == [0]
-    assert Replay.parse_frame(lookup_p1[2384]) == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
-    assert Replay.parse_frame(lookup_p1[2366]) == [A.ANGLES_DISABLED, A.DOWN_PRESS]

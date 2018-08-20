@@ -5,6 +5,7 @@ import os
 import re
 
 class Action(enum.IntEnum):
+    INVALID = -1
     JUMP_PRESS = 0
     JUMP_RELEASE = 1
     ATTACK_PRESS = 2
@@ -133,10 +134,17 @@ class Replay:
         ]}
 
     @classmethod
-    def parse_frame(cls, frame):
+    def convert_frame_tokens_to_actions(cls, frame):
         return [
-            cls.action_lookup[x] if x[0] != "y" else int(x[1:]) for x in frame
+            cls.action_lookup.get(x, Action.INVALID)
+            if x[0] != "y" else int(x[1:]) for x in frame
         ]
+
+    @classmethod
+    def get_parsed_frame_lookup_table(cls, frames):
+        return {int(x[0]): cls.convert_frame_tokens_to_actions(x[1:]) for x in [
+            [y for y in Replay.action_pattern.split(z) if y] for z in frames
+        ]}
     
     @staticmethod
     def snap_frame(lookup, n):
@@ -154,3 +162,14 @@ class Replay:
         if result == 360:
             return 0
         return result
+
+    def __init__(self, replay_file_path):
+        replay_buffer = self.read_replay_buffer(replay_file_path)
+        self.name = self.get_name(replay_buffer)
+        self.version = self.get_version(replay_buffer)
+
+        frames_all_players = self.get_frames_all_players(self.get_players(replay_buffer))
+        self.duration = self.get_duration(frames_all_players)
+        self.lookups = [
+            self.get_parsed_frame_lookup_table(x) for x in frames_all_players
+        ]
