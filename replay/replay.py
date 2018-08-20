@@ -128,10 +128,9 @@ class Replay:
 
     @staticmethod
     def get_frame_lookup_table(frames):
-        frames_split = [
-            [a for a in Replay.action_pattern.split(x) if a] for x in frames
-        ]
-        return {int(x[0]): x[1:] for x in frames_split}
+        return {int(x[0]): x[1:] for x in [
+            [y for y in Replay.action_pattern.split(z) if y] for z in frames
+        ]}
 
     @classmethod
     def parse_frame(cls, frame):
