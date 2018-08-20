@@ -36,15 +36,20 @@ def test_get_players():
     assert len(players) == 1
     assert players[0] == SAMPLE_PLAYER_DATA
 
-def test_get_actions():
-    actions_p1 = Replay.get_actions(SAMPLE_PLAYER_DATA)
+def test_get_frames():
+    actions_p1 = Replay.get_frames(SAMPLE_PLAYER_DATA)
     assert len(actions_p1) == 717
     assert actions_p1[0] == "1Z"
     assert actions_p1[1] == "101zy327R"
-    assert actions_p1[-1] == "2385y  0"
+    assert actions_p1[24] == "148C"
+    assert actions_p1[29] == "154Zy  0rc"
+    assert actions_p1[394] == "1293zy143LU"
+    assert actions_p1[716] == "2385y  0"
+    assert actions_p1[715] == "2384Zy180d"
+    assert actions_p1[714] == "2366zD"
 
-def test_actions_all_players():
-    actions_all_players = Replay.get_actions_all_players(SAMPLE_REPLAY_DATA)
+def test_get_frames_all_players():
+    actions_all_players = Replay.get_frames_all_players(SAMPLE_REPLAY_DATA)
     assert len(actions_all_players) == 1
     actions_p1 = actions_all_players[0]
     assert len(actions_p1) == 717
@@ -58,10 +63,10 @@ def test_actions_all_players():
     assert actions_p1[714] == "2366zD"
 
 def test_get_duration():
-    assert Replay.get_duration(Replay.get_actions_all_players(SAMPLE_REPLAY_DATA)) == 2385
+    assert Replay.get_duration(Replay.get_frames_all_players(SAMPLE_REPLAY_DATA)) == 2385
 
-def test_get_lookup():
-    lookup_p1 = Replay.get_lookup(Replay.get_actions(SAMPLE_PLAYER_DATA))
+def test_get_frame_lookup_table():
+    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
     assert len(lookup_p1.keys()) == 717
     assert lookup_p1[1] == ["Z"]
     assert lookup_p1[101] == ["z", "y327", "R"]
@@ -72,42 +77,42 @@ def test_get_lookup():
     assert lookup_p1[2384] == ["Z", "y180", "d"]
     assert lookup_p1[2366] == ["z", "D"]
 
-def test_snap_index_to_lookup():
-    lookup_p1 = Replay.get_lookup(Replay.get_actions(SAMPLE_PLAYER_DATA))
-    assert Replay.snap_index_to_lookup(lookup_p1, 1) == 1
-    assert Replay.snap_index_to_lookup(lookup_p1, 100) == 1
-    assert Replay.snap_index_to_lookup(lookup_p1, 101) == 101
-    assert Replay.snap_index_to_lookup(lookup_p1, 112) == 112
-    assert Replay.snap_index_to_lookup(lookup_p1, 114) == 112
-    assert Replay.snap_index_to_lookup(lookup_p1, 115) == 115
-    assert Replay.snap_index_to_lookup(lookup_p1, 118) == 115
-    assert Replay.snap_index_to_lookup(lookup_p1, 2385) == 2385
-    assert Replay.snap_index_to_lookup(lookup_p1, 9999) == 2385
+def test_snap_frame():
+    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
+    assert Replay.snap_frame(lookup_p1, 1) == 1
+    assert Replay.snap_frame(lookup_p1, 100) == 1
+    assert Replay.snap_frame(lookup_p1, 101) == 101
+    assert Replay.snap_frame(lookup_p1, 112) == 112
+    assert Replay.snap_frame(lookup_p1, 114) == 112
+    assert Replay.snap_frame(lookup_p1, 115) == 115
+    assert Replay.snap_frame(lookup_p1, 118) == 115
+    assert Replay.snap_frame(lookup_p1, 2385) == 2385
+    assert Replay.snap_frame(lookup_p1, 9999) == 2385
 
-def test_snap_index_to_lookup_error():
-    lookup_p1 = Replay.get_lookup(Replay.get_actions(SAMPLE_PLAYER_DATA))
-    with pytest.raises(ValueError): Replay.snap_index_to_lookup(lookup_p1, -1)
+def test_snap_frame_error():
+    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
+    with pytest.raises(ValueError): Replay.snap_frame(lookup_p1, -1)
 
-def test_snap_angle_to_eighth():
-    assert Replay.snap_angle_to_eighth(0) == 0
-    assert Replay.snap_angle_to_eighth(23) == 45
-    assert Replay.snap_angle_to_eighth(45) == 45
-    assert Replay.snap_angle_to_eighth(67) == 45
-    assert Replay.snap_angle_to_eighth(68) == 90
-    assert Replay.snap_angle_to_eighth(180) == 180
-    assert Replay.snap_angle_to_eighth(360) == 0
+def test_snap_angle():
+    assert Replay.snap_angle(0) == 0
+    assert Replay.snap_angle(23) == 45
+    assert Replay.snap_angle(45) == 45
+    assert Replay.snap_angle(67) == 45
+    assert Replay.snap_angle(68) == 90
+    assert Replay.snap_angle(180) == 180
+    assert Replay.snap_angle(360) == 0
 
-def test_snap_angle_to_eighth_error():
-    with pytest.raises(ValueError): Replay.snap_angle_to_eighth(-1)
-    with pytest.raises(ValueError): Replay.snap_angle_to_eighth(361)
+def test_snap_angle_error():
+    with pytest.raises(ValueError): Replay.snap_angle(-1)
+    with pytest.raises(ValueError): Replay.snap_angle(361)
 
-def test_parse_lookup_entry():
-    lookup_p1 = Replay.get_lookup(Replay.get_actions(SAMPLE_PLAYER_DATA))
-    assert Replay.parse_lookup_entry(lookup_p1[1]) == [A.ANGLES_ENABLED]
-    assert Replay.parse_lookup_entry(lookup_p1[101]) == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
-    assert Replay.parse_lookup_entry(lookup_p1[148]) == [A.STRONG_PRESS]
-    assert Replay.parse_lookup_entry(lookup_p1[154]) == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
-    assert Replay.parse_lookup_entry(lookup_p1[1293]) == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
-    assert Replay.parse_lookup_entry(lookup_p1[2385]) == [0]
-    assert Replay.parse_lookup_entry(lookup_p1[2384]) == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
-    assert Replay.parse_lookup_entry(lookup_p1[2366]) == [A.ANGLES_DISABLED, A.DOWN_PRESS]
+def test_parse_frame():
+    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
+    assert Replay.parse_frame(lookup_p1[1]) == [A.ANGLES_ENABLED]
+    assert Replay.parse_frame(lookup_p1[101]) == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
+    assert Replay.parse_frame(lookup_p1[148]) == [A.STRONG_PRESS]
+    assert Replay.parse_frame(lookup_p1[154]) == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
+    assert Replay.parse_frame(lookup_p1[1293]) == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
+    assert Replay.parse_frame(lookup_p1[2385]) == [0]
+    assert Replay.parse_frame(lookup_p1[2384]) == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
+    assert Replay.parse_frame(lookup_p1[2366]) == [A.ANGLES_DISABLED, A.DOWN_PRESS]
