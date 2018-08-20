@@ -43,7 +43,7 @@ class Replay:
     player_pattern = re.compile(player_regex)
     action_regex= r"(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)"
     action_pattern = re.compile(action_regex)
-    frame_regex = r"(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3}[A-z]*)"
+    frame_regex = r"(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})"
     frame_pattern = re.compile(frame_regex)
     date_fmtstr = "%H%M%S%d%m%Y"
 
@@ -140,6 +140,13 @@ class Replay:
                 for action in action_data
             ]
         }
+
+    @classmethod
+    def parse_lookup_entry(cls, entry):
+        return [
+            cls.token_action_lookup[token] if token[0] != "y" else int(token[1:]) 
+            for token in entry
+        ]
     
     @staticmethod
     def snap_index_to_lookup(lookup, n):
