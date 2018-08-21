@@ -129,6 +129,11 @@ def test_snap_angle():
     assert Replay.snap_angle(180) == 180
     assert Replay.snap_angle(360) == 0
 
+def test_get_closest_frame():
+    lookup_p1 = Replay.get_frame_lookup_table(Replay.get_frames(SAMPLE_PLAYER_DATA))
+    assert Replay.get_closest_frame(lookup_p1, 100) == ["Z"]
+    assert Replay.get_closest_frame(lookup_p1, 101) == ["z", "y327", "R"]
+
 def test_snap_angle_error():
     with pytest.raises(ValueError): Replay.snap_angle(-1)
     with pytest.raises(ValueError): Replay.snap_angle(361)

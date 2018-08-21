@@ -154,6 +154,10 @@ class Replay:
         if i: return keys[i-1]
         raise ValueError
     
+    @classmethod
+    def get_closest_frame(cls, lookup, n):
+        return lookup[cls.snap_frame(lookup, n)]
+
     @staticmethod
     def snap_angle(n):
         if n < 0 or n > 360: raise ValueError
