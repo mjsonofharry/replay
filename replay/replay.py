@@ -72,6 +72,7 @@ class Replay:
         "U": Action.UP_PRESS,
         "u": Action.UP_RELEASE,
         "M": Action.UP_TAP,
+        "P": Action.UP_TAP,
         "D": Action.DOWN_PRESS,
         "d": Action.DOWN_RELEASE,
         "O": Action.DOWN_TAP,
