@@ -92,13 +92,20 @@ class Replay:
         return data
 
     @staticmethod
+    def is_starred(replay_buffer):
+        return replay_buffer[0] == 1
+
+    @staticmethod
     def get_name(replay_buffer):
-        return replay_buffer.split("\n", 1)[0].split(" ", 1)[0]
+        return replay_buffer[21:53].rstrip()
+
+    @staticmethod
+    def get_description(replay_buffer):
+        return replay_buffer[53:193].rstrip()
 
     @staticmethod
     def get_version(replay_buffer):
-        ln = replay_buffer.split("\n", 1)[0]
-        return int(ln[1:3]), int(ln[3:5]), int(ln[5:7])
+        return int(replay_buffer[1:3]), int(replay_buffer[3:5]), int(replay_buffer[5:7])
 
     @classmethod
     def get_date(cls, replay_buffer):
@@ -117,7 +124,9 @@ class Replay:
 
     @classmethod
     def get_frames_all_players(cls, replay_buffer):
-        return [cls.get_frames(x) for x in cls.get_players(replay_buffer)]
+        return [
+            cls.get_frames(x) for x in cls.get_players(replay_buffer)
+        ]
 
     @staticmethod
     def get_duration(frames_all_players):
@@ -128,9 +137,11 @@ class Replay:
 
     @staticmethod
     def get_frame_lookup_table(frames):
-        return {int(x[0]): x[1:] for x in [
-            [y for y in Replay.action_pattern.split(z) if y] for z in frames
-        ]}
+        return {
+            int(x[0]): x[1:] for x in [
+                [y for y in Replay.action_pattern.split(z) if y] for z in frames
+            ]
+        }
 
     @classmethod
     def convert_frame_tokens_to_actions(cls, frame):
@@ -141,9 +152,11 @@ class Replay:
 
     @classmethod
     def get_parsed_frame_lookup_table(cls, frames):
-        return {int(x[0]): cls.convert_frame_tokens_to_actions(x[1:]) for x in [
-            [y for y in Replay.action_pattern.split(z) if y] for z in frames
-        ]}
+        return {
+            int(x[0]): cls.convert_frame_tokens_to_actions(x[1:]) for x in [
+                [y for y in Replay.action_pattern.split(z) if y] for z in frames
+            ]
+        }
     
     @staticmethod
     def snap_frame(lookup, n):
@@ -168,6 +181,7 @@ class Replay:
 
     def __init__(self, replay_buffer):
         self.name = self.get_name(replay_buffer)
+        self.description = self.get_description(replay_buffer)
         self.version = self.get_version(replay_buffer)
 
         frames_all = self.get_frames_all_players(replay_buffer)
