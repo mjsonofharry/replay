@@ -137,3 +137,20 @@ def test_get_closest_frame():
 def test_snap_angle_error():
     with pytest.raises(ValueError): Replay.snap_angle(-1)
     with pytest.raises(ValueError): Replay.snap_angle(361)
+
+def test_init():
+    replay = Replay(SAMPLE_REPLAY_DATA)
+    assert replay.name == "001030521211831072018REPLAY"
+    assert replay.version == (1, 3, 5)
+    assert replay.duration == 2385
+    assert len(replay.lookups) == 1
+    lookup_p1 = replay.lookups[0]
+    assert len(lookup_p1) == 717
+    assert lookup_p1[1] == [A.ANGLES_ENABLED]
+    assert lookup_p1[101] == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
+    assert lookup_p1[148] == [A.STRONG_PRESS]
+    assert lookup_p1[154] == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
+    assert lookup_p1[1293] == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
+    assert lookup_p1[2385] == [0]
+    assert lookup_p1[2384] == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
+    assert lookup_p1[2366] == [A.ANGLES_DISABLED, A.DOWN_PRESS]

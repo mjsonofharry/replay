@@ -168,11 +168,10 @@ class Replay:
             return 0
         return result
 
-    def __init__(self, replay_file_path):
-        replay_buffer = self.read_replay_buffer(replay_file_path)
+    def __init__(self, replay_buffer):
         self.name = self.get_name(replay_buffer)
         self.version = self.get_version(replay_buffer)
 
-        frames_all = self.get_frames_all_players(self.get_players(replay_buffer))
+        frames_all = self.get_frames_all_players(replay_buffer)
         self.duration = self.get_duration(frames_all)
         self.lookups = [self.get_parsed_frame_lookup_table(x) for x in frames_all]
