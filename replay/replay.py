@@ -48,8 +48,6 @@ class Replay:
     action_pattern = re.compile(action_regex)
     date_fmtstr = "%H%M%S%d%m%Y"
 
-    # Based on work by /u/MatthewMJV
-    # Source: https://www.reddit.com/r/RivalsOfAether/comments/5sxvw2/what_i_have_learned_from_looking_through_replays/
     action_lookup = {
         "J": Action.JUMP_PRESS,
         "j": Action.JUMP_RELEASE,
