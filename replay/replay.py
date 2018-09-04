@@ -105,11 +105,16 @@ class Replay:
 
     @staticmethod
     def get_version(replay_buffer):
-        return int(replay_buffer[1:3]), int(replay_buffer[3:5]), int(replay_buffer[5:7])
+        return (
+            int(replay_buffer[1:3]), 
+            int(replay_buffer[3:5]),
+            int(replay_buffer[5:7])
+        )
 
     @classmethod
     def get_date(cls, replay_buffer):
-        return datetime.datetime.strptime(replay_buffer[7:21], cls.date_fmtstr)
+        return datetime.datetime.strptime(
+            replay_buffer[7:21], cls.date_fmtstr)
 
     @classmethod
     def get_players(cls, replay_buffer):
@@ -118,8 +123,9 @@ class Replay:
     @classmethod
     def get_frames(cls, player_buffer):
         return [
-            x for x in 
-            cls.frame_pattern.split(player_buffer.split("\n")[1].rstrip()) if x
+            x for x in cls.frame_pattern.split(
+                player_buffer.split("\n")[1].rstrip()) 
+            if x
         ]
 
     @classmethod
@@ -135,12 +141,15 @@ class Replay:
             for frames in frames_all_players
         ])
 
+
     @staticmethod
     def get_frame_lookup_table(frames):
+        split_frames = [
+            [x1 for x1 in Replay.action_pattern.split(x) if x1] 
+            for x in frames
+        ]
         return {
-            int(x[0]): x[1:] for x in [
-                [y for y in Replay.action_pattern.split(z) if y] for z in frames
-            ]
+            int(x[0]): x[1:] for x in split_frames
         }
 
     @classmethod
@@ -152,10 +161,13 @@ class Replay:
 
     @classmethod
     def get_parsed_frame_lookup_table(cls, frames):
+        split_frames = [
+            [x1 for x1 in Replay.action_pattern.split(x) if x1] 
+            for x in frames
+        ]
         return {
-            int(x[0]): cls.convert_frame_tokens_to_actions(x[1:]) for x in [
-                [y for y in Replay.action_pattern.split(z) if y] for z in frames
-            ]
+            int(x[0]): cls.convert_frame_tokens_to_actions(x[1:])
+            for x in split_frames
         }
     
     @staticmethod
@@ -186,4 +198,6 @@ class Replay:
 
         frames_all = self.get_frames_all_players(replay_buffer)
         self.duration = self.get_duration(frames_all)
-        self.lookups = [self.get_parsed_frame_lookup_table(x) for x in frames_all]
+        self.lookups = [
+            self.get_parsed_frame_lookup_table(x) for x in frames_all
+        ]
