@@ -1,43 +1,9 @@
-import enum
 import bisect
 import datetime
 import os
 import re
+from .utilities import Action, Character
 
-class Action(enum.IntEnum):
-    INVALID = -1
-    JUMP_PRESS = 0
-    JUMP_RELEASE = 1
-    ATTACK_PRESS = 2
-    ATTACK_RELEASE = 3
-    SPECIAL_PRESS = 4
-    SPECIAL_RELEASE = 5
-    STRONG_PRESS = 6
-    STRONG_RELEASE = 7
-    STRONG_LEFT_PRESS = 8
-    STRONG_LEFT_RELEASE = 9
-    STRONG_RIGHT_PRESS = 10
-    STRONG_RIGHT_RELEASE = 11
-    STRONG_UP_PRESS = 12
-    STRONG_UP_RELEASE = 13
-    STRONG_DOWN_PRESS = 14
-    STRONG_DOWN_RELEASE = 15
-    DODGE_PRESS = 16
-    DODGE_RELEASE = 17
-    UP_PRESS = 18
-    UP_RELEASE = 19
-    UP_TAP = 20
-    DOWN_PRESS = 21
-    DOWN_RELEASE = 22
-    DOWN_TAP = 23
-    LEFT_PRESS = 24
-    LEFT_RELEASE = 25
-    LEFT_TAP = 26
-    RIGHT_PRESS = 27
-    RIGHT_RELEASE = 28
-    RIGHT_TAP = 29
-    ANGLES_ENABLED = 30
-    ANGLES_DISABLED = 31
 
 class Replay:
     player_regex = r"H.*\n.*\n"
@@ -119,6 +85,18 @@ class Replay:
     @classmethod
     def get_players(cls, replay_buffer):
         return cls.player_pattern.findall(replay_buffer)
+
+    @staticmethod
+    def get_player_name(player_buffer):
+        return player_buffer[:34].rstrip()
+
+    @staticmethod
+    def get_player_tag(player_buffer):
+        return player_buffer[34:39].rstrip()
+
+    @staticmethod
+    def get_character(cls, player_buffer):
+        return Character(player_buffer[39:41])
 
     @classmethod
     def get_frames(cls, player_buffer):
