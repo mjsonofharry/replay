@@ -2,7 +2,7 @@ import bisect
 import datetime
 import os
 import re
-from .utilities import Action, Character
+from .utilities import Action, Character, Stage, StageType
 
 
 class FrameData:
@@ -105,15 +105,19 @@ class PlayerData:
     frame_pattern = re.compile(frame_regex)
 
     @staticmethod
+    def is_human(player_data):
+        return player_data[0] == "H"
+
+    @staticmethod
     def get_player_name(player_data):
-        return player_data[:34].rstrip()
+        return player_data[1:34].rstrip()
 
     @staticmethod
     def get_player_tag(player_data):
         return player_data[34:39].rstrip()
 
     @staticmethod
-    def get_character(cls, player_data):
+    def get_character(player_data):
         return Character(int(player_data[39:41]))
 
     @classmethod
@@ -135,14 +139,6 @@ class ReplayData:
         return replay_data[0] == 1
 
     @staticmethod
-    def get_name(replay_data):
-        return replay_data[21:53].rstrip()
-
-    @staticmethod
-    def get_description(replay_data):
-        return replay_data[53:193].rstrip()
-
-    @staticmethod
     def get_version(replay_data):
         return (
             int(replay_data[1:3]), 
@@ -154,6 +150,38 @@ class ReplayData:
     def get_date(cls, replay_data):
         return datetime.datetime.strptime(
             replay_data[7:21], cls.date_fmtstr)
+
+    @staticmethod
+    def get_name(replay_data):
+        return replay_data[21:53].rstrip()
+
+    @staticmethod
+    def get_description(replay_data):
+        return replay_data[53:193].rstrip()
+    
+    @staticmethod
+    def get_stage_type(replay_data):
+        return StageType(int(replay_data[204]))
+
+    @staticmethod
+    def get_stage(replay_data):
+        return Stage(int(replay_data[205:207]))
+
+    @staticmethod
+    def get_stock(replay_data):
+        return int(replay_data[207:209])
+
+    @staticmethod
+    def get_time(replay_data):
+        return int(replay_data[209:211])
+
+    @staticmethod
+    def is_teams_enabled(replay_data):
+        return bool(int(replay_data[212]))
+
+    @staticmethod
+    def is_friendly_fire_enabled(replay_data):
+        return bool(int(replay_data[213]))
 
     @classmethod
     def get_player_data(cls, replay_data):
