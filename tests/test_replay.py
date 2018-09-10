@@ -3,8 +3,7 @@ import pytest
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from replay import ReplayData, PlayerData, FrameData
-from replay import Action as A
+from replay import ReplayData, PlayerData, FrameData, Action, Character, StageType, Stage
 
 
 SAMPLE_REPLAY_DATA = '''001030521211831072018SAMPLE REPLAY                   This is a replay I recorded to use as a sample in my replay parser.                                                                         0000022740
@@ -25,30 +24,30 @@ SAMPLE_PLAYER_DATA = '''HPlayer 1                              10000010004F2EAFC
 
 class TestFrameData:
     def test_convert_token_to_action(self):
-        assert FrameData.convert_token_to_action("Z") == A.ANGLES_ENABLED
+        assert FrameData.convert_token_to_action("Z") == Action.ANGLES_ENABLED
         assert FrameData.convert_token_to_action("y327") == 327
-        assert FrameData.convert_token_to_action("R") == A.RIGHT_PRESS
+        assert FrameData.convert_token_to_action("R") == Action.RIGHT_PRESS
 
     def test_convert_multiple_tokens_to_actions(self):
-        assert FrameData.convert_multiple_tokens_to_actions(["Z"]) == [A.ANGLES_ENABLED]
-        assert FrameData.convert_multiple_tokens_to_actions(["z", "y327", "R"]) == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
-        assert FrameData.convert_multiple_tokens_to_actions(["C"]) == [A.STRONG_PRESS]
-        assert FrameData.convert_multiple_tokens_to_actions(["Z", "y  0", "r", "c"]) == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
-        assert FrameData.convert_multiple_tokens_to_actions(["z", "y143", "L", "U"]) == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
+        assert FrameData.convert_multiple_tokens_to_actions(["Z"]) == [Action.ANGLES_ENABLED]
+        assert FrameData.convert_multiple_tokens_to_actions(["z", "y327", "R"]) == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
+        assert FrameData.convert_multiple_tokens_to_actions(["C"]) == [Action.STRONG_PRESS]
+        assert FrameData.convert_multiple_tokens_to_actions(["Z", "y  0", "r", "c"]) == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
+        assert FrameData.convert_multiple_tokens_to_actions(["z", "y143", "L", "U"]) == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
         assert FrameData.convert_multiple_tokens_to_actions(["y  0"]) == [0]
-        assert FrameData.convert_multiple_tokens_to_actions(["Z", "y180", "d"]) == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
-        assert FrameData.convert_multiple_tokens_to_actions(["z", "D"]) == [A.ANGLES_DISABLED, A.DOWN_PRESS]
+        assert FrameData.convert_multiple_tokens_to_actions(["Z", "y180", "d"]) == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
+        assert FrameData.convert_multiple_tokens_to_actions(["z", "D"]) == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
 
     def test_get_lookup_table(self):
         lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        assert lookup_p1[1] == [A.ANGLES_ENABLED]
-        assert lookup_p1[101] == [A.ANGLES_DISABLED, 327, A.RIGHT_PRESS]
-        assert lookup_p1[148] == [A.STRONG_PRESS]
-        assert lookup_p1[154] == [A.ANGLES_ENABLED, 0, A.RIGHT_RELEASE, A.STRONG_RELEASE]
-        assert lookup_p1[1293] == [A.ANGLES_DISABLED, 143, A.LEFT_PRESS, A.UP_PRESS]
+        assert lookup_p1[1] == [Action.ANGLES_ENABLED]
+        assert lookup_p1[101] == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
+        assert lookup_p1[148] == [Action.STRONG_PRESS]
+        assert lookup_p1[154] == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
+        assert lookup_p1[1293] == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
         assert lookup_p1[2385] == [0]
-        assert lookup_p1[2384] == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
-        assert lookup_p1[2366] == [A.ANGLES_DISABLED, A.DOWN_PRESS]
+        assert lookup_p1[2384] == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
+        assert lookup_p1[2366] == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
 
     def test_get_lookup_table_raw(self):
         lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
@@ -93,7 +92,7 @@ class TestFrameData:
         assert FrameData.snap_angle(360) == 0
 
     def test_get_closest_frame(self):
-        lookup_p1 = FrameData.get_raw_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
         assert FrameData.get_closest_action(lookup_p1, 100) == ["Z"]
         assert FrameData.get_closest_action(lookup_p1, 101) == ["z", "y327", "R"]
 
@@ -104,16 +103,16 @@ class TestFrameData:
 
 class TestPlayerData:
     def test_is_human(self):
-        pytest.fail("Test case not covered")
+        assert PlayerData.is_human(SAMPLE_PLAYER_DATA) == True
     
-    def test_get_player_name(self):
-        pytest.fail("Test case not covered")
+    def test_get_name(self):
+        assert PlayerData.get_name(SAMPLE_PLAYER_DATA) == "Player 1"
 
-    def test_get_player_tag(self):
-        pytest.fail("Test case not covered")
+    def test_get_tag(self):
+        assert PlayerData.get_tag(SAMPLE_PLAYER_DATA) == ""
 
     def test_get_character(self):
-        pytest.fail("Test case not covered")
+        assert PlayerData.get_character(SAMPLE_PLAYER_DATA) == Character.ORI
 
     def test_get_frame_data(self):
         actions_p1 = PlayerData.get_frame_data(SAMPLE_PLAYER_DATA)
@@ -129,11 +128,11 @@ class TestPlayerData:
 
 
 class TestReplayData:
-    def test_is_starred_false(self):
-        assert ReplayData.is_starred(SAMPLE_REPLAY_DATA) == False
-
     def test_is_starred_true(self):
         pytest.fail("Test case not covered")
+
+    def test_is_starred_false(self):
+        assert ReplayData.is_starred(SAMPLE_REPLAY_DATA) == False
 
     def test_get_version(self):
         assert ReplayData.get_version(SAMPLE_REPLAY_DATA) == (1, 3, 5)
@@ -150,25 +149,25 @@ class TestReplayData:
         assert ReplayData.get_description(SAMPLE_REPLAY_DATA) == "This is a replay I recorded to use as a sample in my replay parser."
 
     def test_get_stage_type(self):
-        pytest.fail("Test case not covered")
+        assert ReplayData.get_stage_type(SAMPLE_REPLAY_DATA) == StageType.AETHER
 
     def test_get_stage(self):
-        pytest.fail("Test case not covered")
+        assert ReplayData.get_stage(SAMPLE_REPLAY_DATA) == Stage.SPIRIT_TREE
 
     def test_get_stock(self):
-        pytest.fail("Test case not covered")
+        assert ReplayData.get_stock(SAMPLE_REPLAY_DATA) == 1
 
     def test_get_time(self):
-        pytest.fail("Test case not covered")
+        assert ReplayData.get_time(SAMPLE_REPLAY_DATA) == 8
 
     def test_is_teams_enabled_true(self):
-        pytest.fail("Test case not covered")
+        assert ReplayData.is_teams_enabled(SAMPLE_REPLAY_DATA) == False
     
     def test_is_teams_enabled_false(self):
         pytest.fail("Test case not covered")
 
     def test_is_friendly_fire_enabled_true(self):
-        pytest.fail("Test case not covered")
+        assert ReplayData.is_friendly_fire_enabled(SAMPLE_REPLAY_DATA) == False
 
     def test_is_friendly_fire_enabled_false(self):
         pytest.fail("Test case not covered")

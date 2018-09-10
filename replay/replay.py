@@ -101,11 +101,11 @@ class PlayerData:
         return player_data[0] == "H"
 
     @staticmethod
-    def get_player_name(player_data):
+    def get_name(player_data):
         return player_data[1:34].rstrip()
 
     @staticmethod
-    def get_player_tag(player_data):
+    def get_tag(player_data):
         return player_data[34:39].rstrip()
 
     @staticmethod
