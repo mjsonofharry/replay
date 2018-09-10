@@ -24,18 +24,6 @@ SAMPLE_PLAYER_DATA = '''HPlayer 1                              10000010004F2EAFC
 
 
 class TestFrameData:
-    def test_get_raw_lookup_table(self):
-        lookup_p1 = FrameData.get_raw_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        assert len(lookup_p1.keys()) == 717
-        assert lookup_p1[1] == ["Z"]
-        assert lookup_p1[101] == ["z", "y327", "R"]
-        assert lookup_p1[148] == ["C"]
-        assert lookup_p1[154] == ["Z", "y  0", "r", "c"]
-        assert lookup_p1[1293] == ["z", "y143", "L", "U"]
-        assert lookup_p1[2385] == ["y  0"]
-        assert lookup_p1[2384] == ["Z", "y180", "d"]
-        assert lookup_p1[2366] == ["z", "D"]
-
     def test_convert_token_to_action(self):
         assert FrameData.convert_token_to_action("Z") == A.ANGLES_ENABLED
         assert FrameData.convert_token_to_action("y327") == 327
@@ -62,6 +50,18 @@ class TestFrameData:
         assert lookup_p1[2384] == [A.ANGLES_ENABLED, 180, A.DOWN_RELEASE]
         assert lookup_p1[2366] == [A.ANGLES_DISABLED, A.DOWN_PRESS]
 
+    def test_get_lookup_table_raw(self):
+        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
+        assert len(lookup_p1.keys()) == 717
+        assert lookup_p1[1] == ["Z"]
+        assert lookup_p1[101] == ["z", "y327", "R"]
+        assert lookup_p1[148] == ["C"]
+        assert lookup_p1[154] == ["Z", "y  0", "r", "c"]
+        assert lookup_p1[1293] == ["z", "y143", "L", "U"]
+        assert lookup_p1[2385] == ["y  0"]
+        assert lookup_p1[2384] == ["Z", "y180", "d"]
+        assert lookup_p1[2366] == ["z", "D"]
+
     def test_snap_frame(self):
         lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
         assert FrameData.snap_frame(lookup_p1, 1) == 1
@@ -79,7 +79,7 @@ class TestFrameData:
         with pytest.raises(ValueError): FrameData.snap_frame(lookup_p1, -1)
 
     def test_snap_frame_transitive(self):
-        lookup_p1 = FrameData.get_raw_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
         assert lookup_p1[FrameData.snap_frame(lookup_p1, 100)] == ["Z"]
         assert lookup_p1[FrameData.snap_frame(lookup_p1, 101)] == ["z", "y327", "R"]
 
@@ -103,6 +103,18 @@ class TestFrameData:
 
 
 class TestPlayerData:
+    def test_is_human(self):
+        pytest.fail("Test case not covered")
+    
+    def test_get_player_name(self):
+        pytest.fail("Test case not covered")
+
+    def test_get_player_tag(self):
+        pytest.fail("Test case not covered")
+
+    def test_get_character(self):
+        pytest.fail("Test case not covered")
+
     def test_get_frame_data(self):
         actions_p1 = PlayerData.get_frame_data(SAMPLE_PLAYER_DATA)
         assert len(actions_p1) == 717
@@ -117,14 +129,11 @@ class TestPlayerData:
 
 
 class TestReplayData:
-    def test_is_starred(self):
+    def test_is_starred_false(self):
         assert ReplayData.is_starred(SAMPLE_REPLAY_DATA) == False
 
-    def test_get_name(self):
-        assert ReplayData.get_name(SAMPLE_REPLAY_DATA) == "SAMPLE REPLAY"
-
-    def test_get_description(self):
-        assert ReplayData.get_description(SAMPLE_REPLAY_DATA) == "This is a replay I recorded to use as a sample in my replay parser."
+    def test_is_starred_true(self):
+        pytest.fail("Test case not covered")
 
     def test_get_version(self):
         assert ReplayData.get_version(SAMPLE_REPLAY_DATA) == (1, 3, 5)
@@ -134,7 +143,37 @@ class TestReplayData:
             year=2018, month=7, day=31,
             hour=21, minute=21, second=18)
 
-    def test_get_players(self):
+    def test_get_name(self):
+        assert ReplayData.get_name(SAMPLE_REPLAY_DATA) == "SAMPLE REPLAY"
+
+    def test_get_description(self):
+        assert ReplayData.get_description(SAMPLE_REPLAY_DATA) == "This is a replay I recorded to use as a sample in my replay parser."
+
+    def test_get_stage_type(self):
+        pytest.fail("Test case not covered")
+
+    def test_get_stage(self):
+        pytest.fail("Test case not covered")
+
+    def test_get_stock(self):
+        pytest.fail("Test case not covered")
+
+    def test_get_time(self):
+        pytest.fail("Test case not covered")
+
+    def test_is_teams_enabled_true(self):
+        pytest.fail("Test case not covered")
+    
+    def test_is_teams_enabled_false(self):
+        pytest.fail("Test case not covered")
+
+    def test_is_friendly_fire_enabled_true(self):
+        pytest.fail("Test case not covered")
+
+    def test_is_friendly_fire_enabled_false(self):
+        pytest.fail("Test case not covered")
+
+    def test_get_player_data(self):
         players = ReplayData.get_player_data(SAMPLE_REPLAY_DATA)
         assert len(players) == 1
         assert players[0] == SAMPLE_PLAYER_DATA

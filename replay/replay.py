@@ -57,24 +57,16 @@ class FrameData:
         ]
 
     @classmethod
-    def get_raw_lookup_table(cls, frame_data):
+    def get_lookup_table(cls, frame_data, raw=False):
         split_frames = [
             [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
             for x in frame_data
         ]
         return {
-            int(x[0]): x[1:]
-            for x in split_frames
-        }
-
-    @classmethod
-    def get_lookup_table(cls, frame_data):
-        split_frames = [
-            [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
-            for x in frame_data
-        ]
-        return {
-            int(x[0]): cls.convert_multiple_tokens_to_actions(x[1:])
+            int(x[0]): (
+                x[1:] if raw 
+                else cls.convert_multiple_tokens_to_actions(x[1:])
+            )
             for x in split_frames
         }
 
