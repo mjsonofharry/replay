@@ -45,15 +45,15 @@ class FrameData:
     }
 
     @classmethod
-    def convert_token_to_action(cls, token):
-        if token[0] == "y": return int(token[1:])
-        else: return cls.action_lookup.get(token, Action.INVALID)
+    def convert_token_to_action(cls, t):
+        if t[0] == "y": return int(t[1:])
+        else: return cls.action_lookup.get(t, Action.INVALID)
     
     @classmethod
-    def convert_multiple_tokens_to_actions(cls, tokens):
+    def convert_multiple_tokens_to_actions(cls, ts):
         return [
             cls.convert_token_to_action(t) 
-            for t in tokens
+            for t in ts
         ]
 
     @classmethod
@@ -77,6 +77,10 @@ class FrameData:
         if i: return keys[i-1]
         raise ValueError
     
+    @classmethod
+    def snap_multiple_frames(cls, lookup_table, ns):
+        return [cls.snap_frame(lookup_table, n) for n in ns]
+
     @classmethod
     def get_closest_action(cls, lookup_table, n):
         return lookup_table[cls.snap_frame(lookup_table, n)]
@@ -152,6 +156,10 @@ class ReplayData:
         return replay_data[53:193].rstrip()
     
     @staticmethod
+    def __get_unidentified_metadata_1(replay_data):
+        return replay_data[194:204]
+
+    @staticmethod
     def get_stage_type(replay_data):
         return StageType(int(replay_data[204]))
 
@@ -174,6 +182,14 @@ class ReplayData:
     @staticmethod
     def is_friendly_fire_enabled(replay_data):
         return bool(int(replay_data[213]))
+
+    @staticmethod
+    def is_online(replay_data):
+        return bool(int(replay_data[214]))
+
+    @staticmethod
+    def __get_unidentified_metadata_2(replay_data):
+        return int(replay_data[215:218]), int(replay_data[218:222])
 
     @classmethod
     def get_player_data(cls, replay_data):

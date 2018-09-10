@@ -82,6 +82,11 @@ class TestFrameData:
         assert lookup_p1[FrameData.snap_frame(lookup_p1, 100)] == ["Z"]
         assert lookup_p1[FrameData.snap_frame(lookup_p1, 101)] == ["z", "y327", "R"]
 
+    def test_snap_multiple_frames(self):
+        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
+        snapped = FrameData.snap_multiple_frames(lookup_p1, [1, 100, 101, 112, 114, 115, 118, 2385, 9999])
+        assert snapped == [1, 1, 101, 112, 112, 115, 115, 2385, 2385]
+
     def test_snap_angle(self):
         assert FrameData.snap_angle(0) == 0
         assert FrameData.snap_angle(23) == 45
@@ -171,6 +176,12 @@ class TestReplayData:
 
     def test_is_friendly_fire_enabled_false(self):
         pytest.fail("Test case not covered")
+
+    def test_is_online_true(self):
+        pytest.fail("Test case not covered")
+
+    def test_is_online_false(self):
+        assert ReplayData.is_online(SAMPLE_REPLAY_DATA) == False
 
     def test_get_player_data(self):
         players = ReplayData.get_player_data(SAMPLE_REPLAY_DATA)
