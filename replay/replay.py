@@ -2,7 +2,7 @@ import bisect
 import datetime
 import os
 import re
-from .utilities import Action, Character, Stage, StageType
+from .utilities import ActionType, Action, Character, Stage, StageType
 
 
 class FrameData:
@@ -43,6 +43,41 @@ class FrameData:
         "Z": Action.ANGLES_ENABLED,
         "z": Action.ANGLES_DISABLED
     }
+    action_type_lookup = {
+        Action.JUMP_PRESS: ActionType.JUMP,
+        Action.JUMP_RELEASE: ActionType.JUMP,
+        Action.ATTACK_PRESS: ActionType.ATTACK,
+        Action.ATTACK_RELEASE: ActionType.ATTACK,
+        Action.SPECIAL_PRESS: ActionType.SPECIAL,
+        Action.SPECIAL_RELEASE: ActionType.SPECIAL,
+        Action.STRONG_PRESS: ActionType.STRONG,
+        Action.STRONG_RELEASE: ActionType.STRONG,
+        Action.STRONG_LEFT_PRESS: ActionType.STRONG_LEFT,
+        Action.STRONG_LEFT_RELEASE: ActionType.STRONG_LEFT,
+        Action.STRONG_RIGHT_PRESS: ActionType.STRONG_RIGHT,
+        Action.STRONG_RIGHT_RELEASE: ActionType.STRONG_RIGHT,
+        Action.STRONG_UP_PRESS: ActionType.STRONG_UP,
+        Action.STRONG_UP_RELEASE: ActionType.STRONG_UP,
+        Action.STRONG_DOWN_PRESS: ActionType.STRONG_DOWN,
+        Action.STRONG_DOWN_RELEASE: ActionType.STRONG_DOWN,
+        Action.DODGE_PRESS: ActionType.DODGE,
+        Action.DODGE_RELEASE: ActionType.DODGE,
+        Action.UP_PRESS: ActionType.UP,
+        Action.UP_RELEASE: ActionType.UP,
+        Action.UP_TAP: ActionType.UP,
+        Action.UP_TAP: ActionType.UP,
+        Action.DOWN_PRESS: ActionType.DOWN,
+        Action.DOWN_RELEASE: ActionType.DOWN,
+        Action.DOWN_TAP: ActionType.DOWN,
+        Action.LEFT_PRESS: ActionType.LEFT,
+        Action.LEFT_RELEASE: ActionType.LEFT,
+        Action.LEFT_TAP: ActionType.LEFT,
+        Action.RIGHT_PRESS: ActionType.RIGHT,
+        Action.RIGHT_RELEASE: ActionType.RIGHT,
+        Action.RIGHT_TAP: ActionType.RIGHT,
+        Action.ANGLES_ENABLED: ActionType.ANGLES,
+        Action.ANGLES_DISABLED: ActionType.ANGLES
+    }
 
     @classmethod
     def convert_token_to_action(cls, t):
@@ -69,6 +104,29 @@ class FrameData:
             )
             for x in split_frames
         }
+
+    @classmethod
+    def get_state_table(cls, frame_data):
+        split_frames = [
+            [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
+            for x in frame_data
+        ]
+        table = {}
+        state = [False]*14
+        for x in split_frames:
+            n = int(x[0])
+            tokens = x[1:]
+            actions = cls.convert_multiple_tokens_to_actions(tokens)
+            for t, a in zip(tokens, actions):
+                if not isinstance(a, Action):
+                    continue
+                a1 = cls.action_type_lookup[a]
+                if t.isupper():
+                    state[a1] = True
+                else:
+                    state[a1] = False
+            table[n] = state
+        return table
 
     @staticmethod
     def snap_frame(lookup_table, n):

@@ -3,7 +3,7 @@ import pytest
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from replay import ReplayData, PlayerData, FrameData, Action, Character, StageType, Stage
+from replay import ReplayData, PlayerData, FrameData, ActionType, Action, Character, StageType, Stage
 
 
 SAMPLE_REPLAY_DATA = '''001030521211831072018SAMPLE REPLAY                   This is a replay I recorded to use as a sample in my replay parser.                                                                         0000022740
@@ -60,6 +60,12 @@ class TestFrameData:
         assert lookup_p1[2385] == ["y  0"]
         assert lookup_p1[2384] == ["Z", "y180", "d"]
         assert lookup_p1[2366] == ["z", "D"]
+
+    def test_get_state_table(self):
+        state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+        state = [False]*14
+        state[ActionType.ANGLES] = True
+        assert state_p1[1] == state
 
     def test_snap_frame(self):
         lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
