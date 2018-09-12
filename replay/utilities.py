@@ -1,7 +1,7 @@
-from enum import IntEnum
+from enum import Enum, IntEnum
 
 
-class Character(IntEnum):
+class Character(Enum):
     INVALID = -1
     ERROR_1 = 0
     ERROR_2 = 1
@@ -18,7 +18,7 @@ class Character(IntEnum):
     CLAIREN = 12
 
 
-class Action(IntEnum):
+class Action(Enum):
     INVALID = -1
     JUMP_PRESS = 0
     JUMP_RELEASE = 1
@@ -76,7 +76,7 @@ class ActionType(IntEnum):
     ANGLE_RIGHT = 17
 
 
-class Stage(IntEnum):
+class Stage(Enum):
     INVALID = -1
     MENU = 0
     TREETOP_LODGE = 1
@@ -99,7 +99,7 @@ class Stage(IntEnum):
     SWAMPY_ESTUARY = 18
 
 
-class StageType(IntEnum):
+class StageType(Enum):
     INVALID = -1
     BASIC = 0
     AETHER = 1
