@@ -6,42 +6,42 @@ from .utilities import ActionType, Action, Character, Stage, StageType
 
 
 class FrameData:
-    action_regex = r"(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})"
+    action_regex = r'(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})'
     action_pattern = re.compile(action_regex)
     action_lookup = {
-        "J": Action.JUMP_PRESS,
-        "j": Action.JUMP_RELEASE,
-        "A": Action.ATTACK_PRESS,
-        "a": Action.ATTACK_RELEASE,
-        "B": Action.SPECIAL_PRESS,
-        "b": Action.SPECIAL_RELEASE,
-        "C": Action.STRONG_PRESS,
-        "c": Action.STRONG_RELEASE,
-        "F": Action.STRONG_LEFT_PRESS,
-        "f": Action.STRONG_LEFT_RELEASE,
-        "G": Action.STRONG_RIGHT_PRESS,
-        "g": Action.STRONG_RIGHT_RELEASE,
-        "X": Action.STRONG_UP_PRESS,
-        "x": Action.STRONG_UP_RELEASE,
-        "W": Action.STRONG_DOWN_PRESS,
-        "w": Action.STRONG_DOWN_RELEASE,
-        "S": Action.DODGE_PRESS,
-        "s": Action.DODGE_RELEASE,
-        "U": Action.UP_PRESS,
-        "u": Action.UP_RELEASE,
-        "M": Action.UP_TAP,
-        "P": Action.UP_TAP,
-        "D": Action.DOWN_PRESS,
-        "d": Action.DOWN_RELEASE,
-        "O": Action.DOWN_TAP,
-        "L": Action.LEFT_PRESS,
-        "l": Action.LEFT_RELEASE,
-        "E": Action.LEFT_TAP,
-        "R": Action.RIGHT_PRESS,
-        "r": Action.RIGHT_RELEASE,
-        "I": Action.RIGHT_TAP,
-        "Z": Action.ANGLES_ENABLED,
-        "z": Action.ANGLES_DISABLED
+        'J': Action.JUMP_PRESS,
+        'j': Action.JUMP_RELEASE,
+        'A': Action.ATTACK_PRESS,
+        'a': Action.ATTACK_RELEASE,
+        'B': Action.SPECIAL_PRESS,
+        'b': Action.SPECIAL_RELEASE,
+        'C': Action.STRONG_PRESS,
+        'c': Action.STRONG_RELEASE,
+        'F': Action.STRONG_LEFT_PRESS,
+        'f': Action.STRONG_LEFT_RELEASE,
+        'G': Action.STRONG_RIGHT_PRESS,
+        'g': Action.STRONG_RIGHT_RELEASE,
+        'X': Action.STRONG_UP_PRESS,
+        'x': Action.STRONG_UP_RELEASE,
+        'W': Action.STRONG_DOWN_PRESS,
+        'w': Action.STRONG_DOWN_RELEASE,
+        'S': Action.DODGE_PRESS,
+        's': Action.DODGE_RELEASE,
+        'U': Action.UP_PRESS,
+        'u': Action.UP_RELEASE,
+        'M': Action.UP_TAP,
+        'P': Action.UP_TAP,
+        'D': Action.DOWN_PRESS,
+        'd': Action.DOWN_RELEASE,
+        'O': Action.DOWN_TAP,
+        'L': Action.LEFT_PRESS,
+        'l': Action.LEFT_RELEASE,
+        'E': Action.LEFT_TAP,
+        'R': Action.RIGHT_PRESS,
+        'r': Action.RIGHT_RELEASE,
+        'I': Action.RIGHT_TAP,
+        'Z': Action.ANGLES_ENABLED,
+        'z': Action.ANGLES_DISABLED
     }
     action_type_lookup = {
         Action.JUMP_PRESS: ActionType.JUMP,
@@ -92,7 +92,7 @@ class FrameData:
 
     @classmethod
     def convert_token_to_action(cls, t):
-        if t[0] == "y": return int(t[1:])
+        if t[0] == 'y': return int(t[1:])
         else: return cls.action_lookup.get(t, Action.INVALID)
     
     @classmethod
@@ -169,12 +169,12 @@ class FrameData:
 
 
 class PlayerData:
-    frame_regex= r"(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)"
+    frame_regex= r'(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)'
     frame_pattern = re.compile(frame_regex)
 
     @staticmethod
     def is_human(player_data):
-        return player_data[0] == "H"
+        return player_data[0] == 'H'
 
     @staticmethod
     def get_name(player_data):
@@ -192,15 +192,15 @@ class PlayerData:
     def get_frame_data(cls, player_data):
         return [
             x for x in cls.frame_pattern.split(
-                player_data.split("\n")[1].rstrip()) 
+                player_data.split('\n')[1].rstrip()) 
             if x
         ]
 
 
 class ReplayData:
-    player_regex = r"H.*\n.*\n"
+    player_regex = r'H.*\n.*\n'
     player_pattern = re.compile(player_regex)
-    date_fmtstr = "%H%M%S%d%m%Y"
+    date_fmtstr = '%H%M%S%d%m%Y'
 
     @staticmethod
     def is_starred(replay_data):
@@ -276,6 +276,6 @@ class ReplayData:
     @staticmethod
     def get_duration(frame_data_all_players):
         return max([
-            max([int(re.findall(r"^\d+", x)[0]) for x in frames])
+            max([int(re.findall(r'^\d+', x)[0]) for x in frames])
             for frames in frame_data_all_players
         ])
