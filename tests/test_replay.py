@@ -38,6 +38,13 @@ class TestFrameData:
         assert FrameData.convert_multiple_tokens_to_actions(["Z", "y180", "d"]) == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
         assert FrameData.convert_multiple_tokens_to_actions(["z", "D"]) == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
 
+    def test_split_frames_into_tokens(self):
+        split_frames = FrameData.split_frames_into_tokens(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+        assert split_frames[0] == ["1", "Z"]
+        assert split_frames[1] == ["101", "z", "y327", "R"]
+        assert split_frames[-2] == ["2384", "Z", "y180", "d"]
+        assert split_frames[-1] == ["2385", "y  0"]
+
     def test_get_lookup_table(self):
         lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
         assert lookup_p1[1] == [Action.ANGLES_ENABLED]

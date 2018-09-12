@@ -100,7 +100,7 @@ class FrameData:
         return [cls.convert_token_to_action(t) for t in ts]
 
     @classmethod
-    def __split_frames_into_tokens(cls, frame_data):
+    def split_frames_into_tokens(cls, frame_data):
         return [
             [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
             for x in frame_data
@@ -113,14 +113,14 @@ class FrameData:
                 x[1:] if raw 
                 else cls.convert_multiple_tokens_to_actions(x[1:])
             )
-            for x in cls.__split_frames_into_tokens(frame_data)
+            for x in cls.split_frames_into_tokens(frame_data)
         }
 
     @classmethod
     def get_state_table(cls, frame_data):
         table = {}
         state = [False]*18
-        for x in cls.__split_frames_into_tokens(frame_data):
+        for x in cls.split_frames_into_tokens(frame_data):
             state[ActionType.ANGLE_UP:] = [False]*4
             n = int(x[0])
             tokens = x[1:]
