@@ -54,6 +54,28 @@ class Action(IntEnum):
     ANGLES_DISABLED = 31
 
 
+class ActionType(IntEnum):
+    INVALID = -1
+    JUMP = 0
+    ATTACK = 1
+    SPECIAL = 2
+    STRONG = 3
+    STRONG_LEFT = 4
+    STRONG_RIGHT = 5
+    STRONG_UP = 6
+    STRONG_DOWN = 7
+    DODGE = 8
+    UP = 9
+    DOWN = 10
+    LEFT = 11
+    RIGHT = 12
+    ANGLES = 13
+    ANGLE_UP = 14
+    ANGLE_DOWN = 15
+    ANGLE_LEFT = 16
+    ANGLE_RIGHT = 17
+
+
 class Stage(IntEnum):
     INVALID = -1
     MENU = 0
