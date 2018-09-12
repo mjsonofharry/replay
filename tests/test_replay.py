@@ -31,6 +31,14 @@ class TestFrameData:
     def raw_lookup_table(self):
         return FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
 
+    @pytest.fixture(params=list(range(1, 2385, 159)) + [9999])
+    def frame_n(self, request):
+        return request.param
+
+    @pytest.fixture(params=list(range(1, 360, 15)))
+    def angle_n(self, request):
+        return request.param
+
     def test_convert_token_to_action(self):
         assert FrameData.convert_token_to_action('Z') == Action.ANGLES_ENABLED
         assert FrameData.convert_token_to_action('y327') == 327
@@ -135,6 +143,40 @@ class TestFrameData:
         with pytest.raises(ValueError): FrameData.snap_angle(-1)
         with pytest.raises(ValueError): FrameData.snap_angle(361)
 
+    def test_get_lookup_table_performance(self, benchmark):
+        result = benchmark(FrameData.get_lookup_table, PlayerData.get_frame_data(ReplayData.get_player_data(SAMPLE_REPLAY_DATA)[0]))
+        assert isinstance(result, dict)
+        assert len(result.keys()) == 717
+        assert result[1] == [Action.ANGLES_ENABLED]
+        assert result[2385] == [0]
+    
+    def test_get_lookup_table_performance_long(self, benchmark):
+        result = benchmark(lambda: FrameData.get_lookup_table(PlayerData.get_frame_data(ReplayData.get_player_data(SAMPLE_REPLAY_DATA)[0])))
+        assert isinstance(result, dict)
+        assert len(result.keys()) == 717
+        assert result[1] == [Action.ANGLES_ENABLED]
+        assert result[2385] == [0]
+
+    def test_get_state_table_performance(self, benchmark):
+        result = benchmark(FrameData.get_state_table, PlayerData.get_frame_data(ReplayData.get_player_data(SAMPLE_REPLAY_DATA)[0]))
+        assert isinstance(result, dict)
+        assert len(result.keys()) == 717
+        assert isinstance(result[1], list)
+        assert result[1][0] == False
+
+    def test_get_state_table_performance_long(self, benchmark):
+        result = benchmark(lambda: FrameData.get_state_table(PlayerData.get_frame_data(ReplayData.get_player_data(SAMPLE_REPLAY_DATA)[0])))
+        assert isinstance(result, dict)
+        assert len(result.keys()) == 717
+        assert isinstance(result[1], list)
+        assert result[1][0] == False
+
+    def test_snap_frame_performance(self, benchmark, lookup_table, frame_n):
+        benchmark.pedantic(FrameData.snap_frame, args=(lookup_table, frame_n), iterations=1, rounds=1)
+
+    def test_snap_angle_performance(self, benchmark, angle_n):
+        benchmark.pedantic(FrameData.snap_angle, args=(angle_n,), iterations=1, rounds=1)
+
 
 class TestPlayerData:
     def test_is_human(self):
@@ -160,6 +202,12 @@ class TestPlayerData:
         assert actions_p1[714] == '2366zD'
         assert actions_p1[715] == '2384Zy180d'
         assert actions_p1[716] == '2385y  0'
+
+    def test_get_frame_data_performance(self, benchmark):
+        result = benchmark(PlayerData.get_frame_data, SAMPLE_PLAYER_DATA)
+        assert len(result) == 717
+        assert result[0] == '1Z'
+        assert result[716] == '2385y  0'
 
 
 class TestReplayData:
@@ -238,3 +286,8 @@ class TestReplayData:
 
     def test_get_duration(self):
         assert ReplayData.get_duration(ReplayData.get_frame_data_all_players(SAMPLE_REPLAY_DATA)) == 2385
+
+    def test_get_player_data_performance(self, benchmark):
+        result = benchmark(ReplayData.get_player_data, SAMPLE_REPLAY_DATA)
+        assert len(result) == 1
+        assert result[0] == SAMPLE_PLAYER_DATA
