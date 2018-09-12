@@ -35,7 +35,7 @@ class TestFrameData:
     def frame_n(self, request):
         return request.param
 
-    @pytest.fixture(params=list(range(1, 360, 15)))
+    @pytest.fixture(params=list(range(0, 360, 33)))
     def angle_n(self, request):
         return request.param
 
