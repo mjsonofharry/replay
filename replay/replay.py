@@ -76,7 +76,18 @@ class FrameData:
         Action.RIGHT_RELEASE: ActionType.RIGHT,
         Action.RIGHT_TAP: ActionType.RIGHT,
         Action.ANGLES_ENABLED: ActionType.ANGLES,
-        Action.ANGLES_DISABLED: ActionType.ANGLES
+        Action.ANGLES_DISABLED: ActionType.ANGLES,
+    }
+
+    action_type_angle_lookup = {
+        0: (ActionType.ANGLE_RIGHT),
+        45: (ActionType.ANGLE_RIGHT, ActionType.ANGLE_UP),
+        90: (ActionType.ANGLE_UP),
+        135: (ActionType.ANGLE_UP, ActionType.ANGLE_LEFT),
+        180: (ActionType.ANGLE_LEFT),
+        225: (ActionType.ANGLE_LEFT, ActionType.ANGLE_DOWN),
+        270: (ActionType.ANGLE_DOWN),
+        315: (ActionType.ANGLE_DOWN, ActionType.ANGLE_RIGHT)
     }
 
     @classmethod
@@ -86,46 +97,49 @@ class FrameData:
     
     @classmethod
     def convert_multiple_tokens_to_actions(cls, ts):
+        return [cls.convert_token_to_action(t) for t in ts]
+
+    @classmethod
+    def __split_frames_into_tokens(cls, frame_data):
         return [
-            cls.convert_token_to_action(t) 
-            for t in ts
+            [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
+            for x in frame_data
         ]
 
     @classmethod
     def get_lookup_table(cls, frame_data, raw=False):
-        split_frames = [
-            [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
-            for x in frame_data
-        ]
         return {
             int(x[0]): (
                 x[1:] if raw 
                 else cls.convert_multiple_tokens_to_actions(x[1:])
             )
-            for x in split_frames
+            for x in cls.__split_frames_into_tokens(frame_data)
         }
 
     @classmethod
     def get_state_table(cls, frame_data):
-        split_frames = [
-            [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
-            for x in frame_data
-        ]
         table = {}
-        state = [False]*14
-        for x in split_frames:
+        state = [False]*18
+        for x in cls.__split_frames_into_tokens(frame_data):
+            state[ActionType.ANGLE_UP:] = [False]*4
             n = int(x[0])
             tokens = x[1:]
             actions = cls.convert_multiple_tokens_to_actions(tokens)
             for t, a in zip(tokens, actions):
-                if not isinstance(a, Action):
-                    continue
-                a1 = cls.action_type_lookup[a]
-                if t.isupper():
-                    state[a1] = True
+                if isinstance(a, Action):
+                    a1 = cls.action_type_lookup[a]
+                    if t.isupper():
+                        state[a1] = True
+                    else:
+                        state[a1] = False
                 else:
-                    state[a1] = False
-            table[n] = state
+                    a1 = cls.action_type_angle_lookup[cls.snap_angle(a)]
+                    if isinstance(a1, tuple):
+                        state[a1[0]] = True
+                        state[a1[1]] = True
+                    else:
+                        state[a1] = True
+            table[n] = list(state)
         return table
 
     @staticmethod

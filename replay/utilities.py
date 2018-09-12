@@ -70,6 +70,10 @@ class ActionType(IntEnum):
     LEFT = 11
     RIGHT = 12
     ANGLES = 13
+    ANGLE_UP = 14
+    ANGLE_DOWN = 15
+    ANGLE_LEFT = 16
+    ANGLE_RIGHT = 17
 
 
 class Stage(IntEnum):

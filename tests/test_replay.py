@@ -45,9 +45,9 @@ class TestFrameData:
         assert lookup_p1[148] == [Action.STRONG_PRESS]
         assert lookup_p1[154] == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
         assert lookup_p1[1293] == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
-        assert lookup_p1[2385] == [0]
-        assert lookup_p1[2384] == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
         assert lookup_p1[2366] == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
+        assert lookup_p1[2384] == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
+        assert lookup_p1[2385] == [0]
 
     def test_get_lookup_table_raw(self):
         lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
@@ -57,15 +57,30 @@ class TestFrameData:
         assert lookup_p1[148] == ["C"]
         assert lookup_p1[154] == ["Z", "y  0", "r", "c"]
         assert lookup_p1[1293] == ["z", "y143", "L", "U"]
-        assert lookup_p1[2385] == ["y  0"]
-        assert lookup_p1[2384] == ["Z", "y180", "d"]
         assert lookup_p1[2366] == ["z", "D"]
+        assert lookup_p1[2384] == ["Z", "y180", "d"]
+        assert lookup_p1[2385] == ["y  0"]
 
     def test_get_state_table(self):
         state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        state = [False]*14
+        state = [False]*18
         state[ActionType.ANGLES] = True
         assert state_p1[1] == state
+        state[ActionType.ANGLES] = False
+        state[ActionType.ANGLE_RIGHT] = True
+        state[ActionType.ANGLE_DOWN] = True
+        state[ActionType.RIGHT] = True
+        assert state_p1[101] == state
+        state[-4:] = [False]*4
+        state[ActionType.ANGLE_RIGHT] = False
+        state[ActionType.STRONG] = True
+        assert state_p1[148] == state
+        state[-4:] = [False]*4
+        state[ActionType.ANGLES] = True
+        state[ActionType.ANGLE_RIGHT] = True
+        state[ActionType.RIGHT] = False
+        state[ActionType.STRONG] = False
+        assert state_p1[154] == state
 
     def test_snap_frame(self):
         lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
@@ -133,9 +148,9 @@ class TestPlayerData:
         assert actions_p1[24] == "148C"
         assert actions_p1[29] == "154Zy  0rc"
         assert actions_p1[394] == "1293zy143LU"
-        assert actions_p1[716] == "2385y  0"
-        assert actions_p1[715] == "2384Zy180d"
         assert actions_p1[714] == "2366zD"
+        assert actions_p1[715] == "2384Zy180d"
+        assert actions_p1[716] == "2385y  0"
 
 
 class TestReplayData:
