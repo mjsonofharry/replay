@@ -23,6 +23,14 @@ SAMPLE_PLAYER_DATA = '''HPlayer 1                              10000010004F2EAFC
 
 
 class TestFrameData:
+    @pytest.fixture
+    def lookup_table(self):
+        return FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+
+    @pytest.fixture
+    def raw_lookup_table(self):
+        return FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
+
     def test_convert_token_to_action(self):
         assert FrameData.convert_token_to_action('Z') == Action.ANGLES_ENABLED
         assert FrameData.convert_token_to_action('y327') == 327
@@ -45,28 +53,27 @@ class TestFrameData:
         assert split_frames[-2] == ['2384', 'Z', 'y180', 'd']
         assert split_frames[-1] == ['2385', 'y  0']
 
-    def test_get_lookup_table(self):
-        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        assert lookup_p1[1] == [Action.ANGLES_ENABLED]
-        assert lookup_p1[101] == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
-        assert lookup_p1[148] == [Action.STRONG_PRESS]
-        assert lookup_p1[154] == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
-        assert lookup_p1[1293] == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
-        assert lookup_p1[2366] == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
-        assert lookup_p1[2384] == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
-        assert lookup_p1[2385] == [0]
+    def test_get_lookup_table(self, lookup_table):
+        assert len(lookup_table.keys()) == 717
+        assert lookup_table[1] == [Action.ANGLES_ENABLED]
+        assert lookup_table[101] == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
+        assert lookup_table[148] == [Action.STRONG_PRESS]
+        assert lookup_table[154] == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
+        assert lookup_table[1293] == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
+        assert lookup_table[2366] == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
+        assert lookup_table[2384] == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
+        assert lookup_table[2385] == [0]
 
-    def test_get_lookup_table_raw(self):
-        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
-        assert len(lookup_p1.keys()) == 717
-        assert lookup_p1[1] == ['Z']
-        assert lookup_p1[101] == ['z', 'y327', 'R']
-        assert lookup_p1[148] == ['C']
-        assert lookup_p1[154] == ['Z', 'y  0', 'r', 'c']
-        assert lookup_p1[1293] == ['z', 'y143', 'L', 'U']
-        assert lookup_p1[2366] == ['z', 'D']
-        assert lookup_p1[2384] == ['Z', 'y180', 'd']
-        assert lookup_p1[2385] == ['y  0']
+    def test_get_lookup_table_raw(self, raw_lookup_table):
+        assert len(raw_lookup_table.keys()) == 717
+        assert raw_lookup_table[1] == ['Z']
+        assert raw_lookup_table[101] == ['z', 'y327', 'R']
+        assert raw_lookup_table[148] == ['C']
+        assert raw_lookup_table[154] == ['Z', 'y  0', 'r', 'c']
+        assert raw_lookup_table[1293] == ['z', 'y143', 'L', 'U']
+        assert raw_lookup_table[2366] == ['z', 'D']
+        assert raw_lookup_table[2384] == ['Z', 'y180', 'd']
+        assert raw_lookup_table[2385] == ['y  0']
 
     def test_get_state_table(self):
         state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
@@ -89,30 +96,26 @@ class TestFrameData:
         state[ActionType.STRONG] = False
         assert state_p1[154] == state
 
-    def test_snap_frame(self):
-        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        assert FrameData.snap_frame(lookup_p1, 1) == 1
-        assert FrameData.snap_frame(lookup_p1, 100) == 1
-        assert FrameData.snap_frame(lookup_p1, 101) == 101
-        assert FrameData.snap_frame(lookup_p1, 112) == 112
-        assert FrameData.snap_frame(lookup_p1, 114) == 112
-        assert FrameData.snap_frame(lookup_p1, 115) == 115
-        assert FrameData.snap_frame(lookup_p1, 118) == 115
-        assert FrameData.snap_frame(lookup_p1, 2385) == 2385
-        assert FrameData.snap_frame(lookup_p1, 9999) == 2385
+    def test_snap_frame(self, lookup_table):
+        assert FrameData.snap_frame(lookup_table, 1) == 1
+        assert FrameData.snap_frame(lookup_table, 100) == 1
+        assert FrameData.snap_frame(lookup_table, 101) == 101
+        assert FrameData.snap_frame(lookup_table, 112) == 112
+        assert FrameData.snap_frame(lookup_table, 114) == 112
+        assert FrameData.snap_frame(lookup_table, 115) == 115
+        assert FrameData.snap_frame(lookup_table, 118) == 115
+        assert FrameData.snap_frame(lookup_table, 2385) == 2385
+        assert FrameData.snap_frame(lookup_table, 9999) == 2385
 
-    def test_snap_frame_error(self):
-        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        with pytest.raises(ValueError): FrameData.snap_frame(lookup_p1, -1)
+    def test_snap_frame_error(self, lookup_table):
+        with pytest.raises(ValueError): FrameData.snap_frame(lookup_table, -1)
 
-    def test_snap_frame_transitive(self):
-        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
-        assert lookup_p1[FrameData.snap_frame(lookup_p1, 100)] == ['Z']
-        assert lookup_p1[FrameData.snap_frame(lookup_p1, 101)] == ['z', 'y327', 'R']
+    def test_snap_frame_transitive(self, raw_lookup_table):
+        assert raw_lookup_table[FrameData.snap_frame(raw_lookup_table, 100)] == ['Z']
+        assert raw_lookup_table[FrameData.snap_frame(raw_lookup_table, 101)] == ['z', 'y327', 'R']
 
-    def test_snap_multiple_frames(self):
-        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
-        snapped = FrameData.snap_multiple_frames(lookup_p1, [1, 100, 101, 112, 114, 115, 118, 2385, 9999])
+    def test_snap_multiple_frames(self, lookup_table):
+        snapped = FrameData.snap_multiple_frames(lookup_table, [1, 100, 101, 112, 114, 115, 118, 2385, 9999])
         assert snapped == [1, 1, 101, 112, 112, 115, 115, 2385, 2385]
 
     def test_snap_angle(self):
@@ -124,10 +127,9 @@ class TestFrameData:
         assert FrameData.snap_angle(180) == 180
         assert FrameData.snap_angle(360) == 0
 
-    def test_get_closest_frame(self):
-        lookup_p1 = FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
-        assert FrameData.get_closest_action(lookup_p1, 100) == ['Z']
-        assert FrameData.get_closest_action(lookup_p1, 101) == ['z', 'y327', 'R']
+    def test_get_closest_frame(self, raw_lookup_table):
+        assert FrameData.get_closest_action(raw_lookup_table, 100) == ['Z']
+        assert FrameData.get_closest_action(raw_lookup_table, 101) == ['z', 'y327', 'R']
 
     def test_snap_angle_error(self):
         with pytest.raises(ValueError): FrameData.snap_angle(-1)
@@ -161,6 +163,7 @@ class TestPlayerData:
 
 
 class TestReplayData:
+    @pytest.mark.skip
     def test_is_starred_true(self):
         pytest.fail('Test case not covered')
 
@@ -196,15 +199,18 @@ class TestReplayData:
     def test_is_teams_enabled_true(self):
         assert ReplayData.is_teams_enabled(SAMPLE_REPLAY_DATA) == False
     
+    @pytest.mark.skip
     def test_is_teams_enabled_false(self):
         pytest.fail('Test case not covered')
 
     def test_is_friendly_fire_enabled_true(self):
         assert ReplayData.is_friendly_fire_enabled(SAMPLE_REPLAY_DATA) == False
 
+    @pytest.mark.skip
     def test_is_friendly_fire_enabled_false(self):
         pytest.fail('Test case not covered')
 
+    @pytest.mark.skip
     def test_is_online_true(self):
         pytest.fail('Test case not covered')
 
