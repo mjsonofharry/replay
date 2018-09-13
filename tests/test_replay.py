@@ -31,14 +31,6 @@ class TestFrameData:
     def raw_lookup_table(self):
         return FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
 
-    @pytest.fixture(params=list(range(1, 2385, 159)) + [9999])
-    def frame_n(self, request):
-        return request.param
-
-    @pytest.fixture(params=list(range(0, 360, 33)))
-    def angle_n(self, request):
-        return request.param
-
     def test_convert_token_to_action(self):
         assert FrameData.convert_token_to_action('Z') == Action.ANGLES_ENABLED
         assert FrameData.convert_token_to_action('y327') == 327
@@ -156,12 +148,6 @@ class TestFrameData:
         assert len(result.keys()) == 717
         assert isinstance(result[1], list)
         assert result[1][0] == False
-
-    def test_snap_frame_performance(self, benchmark, lookup_table, frame_n):
-        benchmark.pedantic(FrameData.snap_frame, args=(lookup_table, frame_n), iterations=1, rounds=1)
-
-    def test_snap_angle_performance(self, benchmark, angle_n):
-        benchmark.pedantic(FrameData.snap_angle, args=(angle_n,), iterations=1, rounds=1)
 
 
 class TestPlayerData:
