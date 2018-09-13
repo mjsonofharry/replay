@@ -43,6 +43,40 @@ class FrameData:
         'Z': Action.ANGLES_ENABLED,
         'z': Action.ANGLES_DISABLED
     }
+    action_boolean_map = {
+        Action.JUMP_PRESS: True,
+        Action.JUMP_RELEASE: False,
+        Action.ATTACK_PRESS: True,
+        Action.ATTACK_RELEASE: False,
+        Action.SPECIAL_PRESS: True,
+        Action.SPECIAL_RELEASE: False,
+        Action.STRONG_PRESS: True,
+        Action.STRONG_RELEASE: False,
+        Action.STRONG_LEFT_PRESS: True,
+        Action.STRONG_LEFT_RELEASE: False,
+        Action.STRONG_RIGHT_PRESS: True,
+        Action.STRONG_RIGHT_RELEASE: False,
+        Action.STRONG_UP_PRESS: True,
+        Action.STRONG_UP_RELEASE: False,
+        Action.STRONG_DOWN_PRESS: True,
+        Action.STRONG_DOWN_RELEASE: False,
+        Action.DODGE_PRESS: True,
+        Action.DODGE_RELEASE: False,
+        Action.UP_PRESS: True,
+        Action.UP_RELEASE: False,
+        Action.UP_TAP: True,
+        Action.DOWN_PRESS: True,
+        Action.DOWN_RELEASE: False,
+        Action.DOWN_TAP: True,
+        Action.LEFT_PRESS: True,
+        Action.LEFT_RELEASE: False,
+        Action.LEFT_TAP: True,
+        Action.RIGHT_PRESS: True,
+        Action.RIGHT_RELEASE: False,
+        Action.RIGHT_TAP: True,
+        Action.ANGLES_ENABLED: True,
+        Action.ANGLES_DISABLED: False
+    }
     action_type_lookup = {
         Action.JUMP_PRESS: ActionType.JUMP,
         Action.JUMP_RELEASE: ActionType.JUMP,
@@ -79,20 +113,23 @@ class FrameData:
         Action.ANGLES_DISABLED: ActionType.ANGLES,
     }
     action_type_angle_lookup = {
-        0: (ActionType.ANGLE_RIGHT),
+        0: (ActionType.ANGLE_RIGHT,),
         45: (ActionType.ANGLE_RIGHT, ActionType.ANGLE_UP),
-        90: (ActionType.ANGLE_UP),
-        135: (ActionType.ANGLE_UP, ActionType.ANGLE_LEFT),
-        180: (ActionType.ANGLE_LEFT),
+        90: (ActionType.ANGLE_UP,),
+        135: (ActionType.ANGLE_UP, ActionType.ANGLE_LEFT,),
+        180: (ActionType.ANGLE_LEFT,),
         225: (ActionType.ANGLE_LEFT, ActionType.ANGLE_DOWN),
-        270: (ActionType.ANGLE_DOWN),
-        315: (ActionType.ANGLE_DOWN, ActionType.ANGLE_RIGHT)
+        270: (ActionType.ANGLE_DOWN,),
+        315: (ActionType.ANGLE_DOWN, ActionType.ANGLE_RIGHT),
+        360: (ActionType.ANGLE_RIGHT,)
     }
 
     @classmethod
     def convert_token_to_action(cls, t):
-        if t[0] == 'y': return int(t[1:])
-        else: return cls.action_lookup.get(t, Action.INVALID)
+        if t[0] == 'y':
+            return int(t[1:])
+        else:
+            return cls.action_lookup.get(t, Action.INVALID)
     
     @classmethod
     def convert_multiple_tokens_to_actions(cls, ts):
@@ -124,20 +161,12 @@ class FrameData:
             n = int(x[0])
             tokens = x[1:]
             actions = cls.convert_multiple_tokens_to_actions(tokens)
-            for t, a in zip(tokens, actions):
+            for a in actions:
                 if isinstance(a, Action):
-                    a1 = cls.action_type_lookup[a]
-                    if t.isupper():
-                        state[a1] = True
-                    else:
-                        state[a1] = False
+                    state[cls.action_type_lookup[a]] = cls.action_boolean_map[a]
                 else:
-                    a1 = cls.action_type_angle_lookup[cls.snap_angle(a)]
-                    if isinstance(a1, tuple):
-                        state[a1[0]] = True
-                        state[a1[1]] = True
-                    else:
-                        state[a1] = True
+                    for x in cls.action_type_angle_lookup[cls.snap_angle(a)]:
+                        state[x] = True
             table[n] = list(state)
         return table
 
@@ -145,7 +174,8 @@ class FrameData:
     def snap_frame(lookup_table, n):
         keys = list(lookup_table.keys())
         i = bisect.bisect_right(keys, n)
-        if i: return keys[i-1]
+        if i:
+            return keys[i-1]
         raise ValueError
     
     @classmethod
@@ -158,10 +188,9 @@ class FrameData:
 
     @staticmethod
     def snap_angle(n):
-        if n < 0 or n > 360: raise ValueError
-        result = min(
-            [0, 45, 90, 135, 180, 225, 270, 315, 360],
-            key=lambda x: abs(x - n))
+        if n < 0 or n > 360:
+            raise ValueError
+        result = 45 * round(float(n) / 45)
         if result == 360:
             return 0
         return result
