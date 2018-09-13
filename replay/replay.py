@@ -78,7 +78,6 @@ class FrameData:
         Action.ANGLES_ENABLED: ActionType.ANGLES,
         Action.ANGLES_DISABLED: ActionType.ANGLES,
     }
-
     action_type_angle_lookup = {
         0: (ActionType.ANGLE_RIGHT),
         45: (ActionType.ANGLE_RIGHT, ActionType.ANGLE_UP),
