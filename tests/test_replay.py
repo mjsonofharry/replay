@@ -85,11 +85,11 @@ class TestFrameData:
         state[ActionType.ANGLE_DOWN] = True
         state[ActionType.RIGHT] = True
         assert state_p1[101] == state
-        state[-4:] = [False]*4
+        state[-8:] = [False]*8
         state[ActionType.ANGLE_RIGHT] = False
         state[ActionType.STRONG] = True
         assert state_p1[148] == state
-        state[-4:] = [False]*4
+        state[-8:] = [False]*8
         state[ActionType.ANGLES] = True
         state[ActionType.ANGLE_RIGHT] = True
         state[ActionType.RIGHT] = False

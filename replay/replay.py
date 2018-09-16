@@ -157,7 +157,7 @@ class FrameData:
         table = {}
         state = [False]*18
         for x in cls.split_frames_into_tokens(frame_data):
-            state[-4:] = [False]*4
+            state[-8:] = [False]*8
             n = int(x[0])
             tokens = x[1:]
             actions = cls.convert_multiple_tokens_to_actions(tokens)
