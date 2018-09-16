@@ -74,6 +74,10 @@ class ActionType(IntEnum):
     ANGLE_DOWN = 15
     ANGLE_LEFT = 16
     ANGLE_RIGHT = 17
+    TAP_UP = 18
+    TAP_DOWN = 19
+    TAP_LEFT = 20
+    TAP_RIGHT = 21
 
 
 class Stage(Enum):

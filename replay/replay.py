@@ -8,7 +8,7 @@ from .utilities import ActionType, Action, Character, Stage, StageType
 class FrameData:
     action_regex = r'(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})'
     action_pattern = re.compile(action_regex)
-    action_lookup = {
+    token_to_action = {
         'J': Action.JUMP_PRESS,
         'j': Action.JUMP_RELEASE,
         'A': Action.ATTACK_PRESS,
@@ -43,7 +43,7 @@ class FrameData:
         'Z': Action.ANGLES_ENABLED,
         'z': Action.ANGLES_DISABLED
     }
-    action_boolean_map = {
+    action_to_boolean = {
         Action.JUMP_PRESS: True,
         Action.JUMP_RELEASE: False,
         Action.ATTACK_PRESS: True,
@@ -77,7 +77,7 @@ class FrameData:
         Action.ANGLES_ENABLED: True,
         Action.ANGLES_DISABLED: False
     }
-    action_type_lookup = {
+    action_to_action_type = {
         Action.JUMP_PRESS: ActionType.JUMP,
         Action.JUMP_RELEASE: ActionType.JUMP,
         Action.ATTACK_PRESS: ActionType.ATTACK,
@@ -112,7 +112,7 @@ class FrameData:
         Action.ANGLES_ENABLED: ActionType.ANGLES,
         Action.ANGLES_DISABLED: ActionType.ANGLES,
     }
-    action_type_angle_lookup = {
+    angle_to_action_type = {
         0: (ActionType.ANGLE_RIGHT,),
         45: (ActionType.ANGLE_RIGHT, ActionType.ANGLE_UP),
         90: (ActionType.ANGLE_UP,),
@@ -129,7 +129,7 @@ class FrameData:
         if t[0] == 'y':
             return int(t[1:])
         else:
-            return cls.action_lookup.get(t, Action.INVALID)
+            return cls.token_to_action.get(t, Action.INVALID)
     
     @classmethod
     def convert_multiple_tokens_to_actions(cls, ts):
@@ -157,15 +157,15 @@ class FrameData:
         table = {}
         state = [False]*18
         for x in cls.split_frames_into_tokens(frame_data):
-            state[ActionType.ANGLE_UP:] = [False]*4
+            state[-4:] = [False]*4
             n = int(x[0])
             tokens = x[1:]
             actions = cls.convert_multiple_tokens_to_actions(tokens)
             for a in actions:
                 if isinstance(a, Action):
-                    state[cls.action_type_lookup[a]] = cls.action_boolean_map[a]
+                    state[cls.action_to_action_type[a]] = cls.action_to_boolean[a]
                 else:
-                    for x in cls.action_type_angle_lookup[cls.snap_angle(a)]:
+                    for x in cls.angle_to_action_type[cls.snap_angle(a)]:
                         state[x] = True
             table[n] = list(state)
         return table
