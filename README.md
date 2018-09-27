@@ -80,3 +80,5 @@ with open('test.roa') as f:
 [lazerzes](https://github.com/ContentsMayBeHot/RivalsofAetherReplayParser)
 
 [MatthewMJV](https://www.reddit.com/r/RivalsOfAether/comments/5sxvw2/what_i_have_learned_from_looking_through_replays/)
+
+[SerpentAI](https://github.com/SerpentAI/SerpentAI)
