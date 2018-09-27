@@ -13,34 +13,13 @@ class Rect:
         if len(rect) != 4:
             raise ValueError
         self.__rect = rect
-
-    @property
-    def x0(self):
-        return self.__rect[0]
-    
-    @property
-    def y0(self):
-        return self.__rect[1]
-    
-    @property
-    def x1(self):
-        return self.__rect[2]
-    
-    @property
-    def y1(self):
-        return self.__rect[3]
-
-    @property
-    def width(self):
-        return self.x1 - self.x0
-    
-    @property
-    def height(self):
-        return self.y1 - self.y0
-
-    @property
-    def size(self):
-        return (self.width, self.height)
+        self.x0 = rect[0]
+        self.y0 = rect[1]
+        self.x1 = rect[2]
+        self.y1 = rect[3]
+        self.width = self.x1 - self.x0
+        self.height = self.y1 - self.y0
+        self.size = (self.width, self.height)
 
 
 class WindowHandler:
