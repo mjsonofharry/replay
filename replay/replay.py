@@ -3,7 +3,9 @@ import enum
 import re
 from .player import PlayerData
 
+
 class Stage(enum.Enum):
+    
     INVALID = -1
     MENU = 0
     TREETOP_LODGE = 1
@@ -25,12 +27,16 @@ class Stage(enum.Enum):
     NEO_FIRE_CAPITAL = 17
     SWAMPY_ESTUARY = 18
 
+
 class StageType(enum.Enum):
+
     INVALID = -1
     BASIC = 0
     AETHER = 1
 
+
 class ReplayData:
+
     player_regex = r'H.*\n.*\n'
     player_pattern = re.compile(player_regex)
     date_fmtstr = '%H%M%S%d%m%Y'

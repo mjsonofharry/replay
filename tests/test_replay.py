@@ -2,7 +2,9 @@ import datetime as dt
 import pytest
 from test_common import ReplayData, Stage, StageType, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA
 
+
 class TestReplayData:
+    
     @pytest.mark.skip
     def test_is_starred_true(self):
         pytest.fail('Test case not covered')

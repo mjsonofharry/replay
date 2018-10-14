@@ -1,15 +1,19 @@
 from test_common import ReplayData, PlayerData, FrameData, Action, ActionType, SAMPLE_PLAYER_DATA
 import pytest
 
+
 @pytest.fixture
 def lookup_table():
     return FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+
 
 @pytest.fixture
 def raw_lookup_table():
     return FrameData.get_lookup_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
 
+
 class TestFrameData:
+    
     def test_convert_token_to_action(self):
         assert FrameData.convert_token_to_action('Z') == Action.ANGLES_ENABLED
         assert FrameData.convert_token_to_action('y327') == 327

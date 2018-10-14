@@ -1,7 +1,9 @@
 import enum
 import re
 
+
 class Character(enum.Enum):
+    
     INVALID = -1
     ERROR_1 = 0
     ERROR_2 = 1
@@ -17,7 +19,9 @@ class Character(enum.Enum):
     RANNO = 11
     CLAIREN = 12
 
+
 class PlayerData:
+    
     frame_regex= r'(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)'
     frame_pattern = re.compile(frame_regex)
 

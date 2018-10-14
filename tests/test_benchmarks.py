@@ -1,6 +1,8 @@
 from test_common import ReplayData, PlayerData, FrameData, Action, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA
 
+
 class TestBenchmarks:
+    
     def test_get_player_data(self, benchmark):
         result = benchmark(ReplayData.get_player_data, SAMPLE_REPLAY_DATA)
         assert len(result) == 1

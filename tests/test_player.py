@@ -1,6 +1,8 @@
 from test_common import PlayerData, Character, SAMPLE_PLAYER_DATA
 
+
 class TestPlayerData:
+    
     def test_is_human(self):
         assert PlayerData.is_human(SAMPLE_PLAYER_DATA) == True
     

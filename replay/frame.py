@@ -2,7 +2,9 @@ import bisect
 import enum
 import re
 
+
 class Action(enum.Enum):
+
     INVALID = -1
     JUMP_PRESS = 0
     JUMP_RELEASE = 1
@@ -37,7 +39,9 @@ class Action(enum.Enum):
     ANGLES_ENABLED = 30
     ANGLES_DISABLED = 31
 
+
 class ActionType(enum.IntEnum):
+    
     INVALID = -1
     JUMP = 0
     ATTACK = 1
@@ -62,7 +66,9 @@ class ActionType(enum.IntEnum):
     TAP_LEFT = 20
     TAP_RIGHT = 21
 
+
 class FrameData:
+    
     action_regex = r'(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})'
     action_pattern = re.compile(action_regex)
     token_to_action = {
