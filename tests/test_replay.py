@@ -78,8 +78,3 @@ class TestReplayData:
 
     def test_get_duration(self):
         assert ReplayData.get_duration(ReplayData.get_frame_data_all_players(SAMPLE_REPLAY_DATA)) == 2385
-
-    def test_get_player_data_performance(self, benchmark):
-        result = benchmark(ReplayData.get_player_data, SAMPLE_REPLAY_DATA)
-        assert len(result) == 1
-        assert result[0] == SAMPLE_PLAYER_DATA

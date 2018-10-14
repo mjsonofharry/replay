@@ -1,4 +1,4 @@
-from test_common import FrameData, PlayerData, ReplayData, Action, ActionType, SAMPLE_PLAYER_DATA
+from test_common import ReplayData, PlayerData, FrameData, Action, ActionType, SAMPLE_PLAYER_DATA
 import pytest
 
 @pytest.fixture

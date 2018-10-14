@@ -24,9 +24,3 @@ class TestPlayerData:
         assert actions_p1[714] == '2366zD'
         assert actions_p1[715] == '2384Zy180d'
         assert actions_p1[716] == '2385y  0'
-
-    def test_get_frame_data_performance(self, benchmark):
-        result = benchmark(PlayerData.get_frame_data, SAMPLE_PLAYER_DATA)
-        assert len(result) == 717
-        assert result[0] == '1Z'
-        assert result[716] == '2385y  0'
