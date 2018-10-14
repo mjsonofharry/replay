@@ -4,13 +4,13 @@ import numpy as np
 import time
 import win32gui
 
-
 TITLE = 'Rivals of Aether'
 DEFAULT_WIDTH = 976
 DEFAULT_HEIGHT = 579
 
 
 class Rect:
+
     def __init__(self, rect):
         self.x0, self.y0, self.x1, self.y1 = rect
         self.upper_left = (self.x0, self.y0)
@@ -21,6 +21,7 @@ class Rect:
 
 
 class WindowHandler:
+
     def __init__(self):
         self.__hwnd = win32gui.FindWindow(None, TITLE)
 
@@ -50,6 +51,7 @@ class WindowHandler:
 
 
 class FrameCollector():
+
     def __init__(self, window_rect):
         self.__sct = mss.mss()
         self.__target = window_rect
