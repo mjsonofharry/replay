@@ -206,7 +206,7 @@ class FrameData:
         ]
 
     @classmethod
-    def get_lookup_table(cls, frame_data, raw=False):
+    def get_action_table(cls, frame_data, raw=False):
         return {
             int(x[0]): (
                 x[1:] if raw 
@@ -259,7 +259,7 @@ class FrameData:
         return result
 
 
-class ActionTable:
+class LookupTable:
 
     def __init__(self, table):
         self._table = table

@@ -14,9 +14,9 @@ class TestBenchmarks:
         assert result[0] == '1Z'
         assert result[716] == '2385y  0'
 
-    def test_get_lookup_table(self, benchmark):
+    def test_get_action_table(self, benchmark):
         frame_data = PlayerData.get_frame_data(SAMPLE_PLAYER_DATA)
-        result = benchmark(FrameData.get_lookup_table, frame_data)
+        result = benchmark(FrameData.get_action_table, frame_data)
         assert isinstance(result, dict)
         assert len(result.keys()) == 717
         assert result[1] == [Action.ANGLES_ENABLED]
