@@ -61,18 +61,40 @@ Actions, which are used by lookup tables, represent possible player inputs, such
 
 Angles are treated differently by lookup tables and state tables. The former leaves them as normal integers (e.g. 180, 233, 47, etc), while the latter rounds them to the nearest 45 degree increment and then converts them into ANGLE_UP, ANGLE_DOWN, ANGLE_LEFT, ANGLE_RIGHT, or any pair of those that represents a diagonal.
 
+## (Optional) Replay, Player, and ActionTable
+
+Replay and Player objects can be used instead of the aforementioned ReplayData and PlayerData static classes in order to accomodate an object-oriented coding style (see below for an example). They use LRU caching to provide lazy evaluation for some of their more demanding attributes (e.g. for state tables). Otherwise, implementation details are unchanged. 
+
+Action tables are generic wrappers for both lookup and state tables. The _get_ method of an action table provides automatic snapping. Thus, whereas the PlayerData static class returns a collection which can be used to generate a state or lookup table, a Player object simply returns an action table of the requested type.
 
 # Example
+
+## Functional Style
 
 ```
 from replay import FrameData, PlayerData, ReplayData
 
 with open('test.roa') as f:
-    replay = f.read()
-    game_version = ReplayData.get_version(replay)
-    match_duration = ReplayData.get_duration(ReplayData.test_get_all_frame_data(replay))
-    players = ReplayData.get_player_data(replay)
-    state_table = FrameData.get_state_table(PlayerData.get_frame_data(players[0]))
+    replay_data = f.read()
+    game_version = ReplayData.get_version(replay_data)
+    match_duration = ReplayData.get_duration(ReplayData.test_get_all_frame_data(replay_data))
+    player_data = ReplayData.get_player_data(replay_data)
+    state_table = FrameData.get_state_table(PlayerData.get_frame_data(player_data[0]))
+    x = state_table[FrameData.snap_frame(100)]
+```
+
+## Object-Oriented Style
+
+```
+from replay import Replay, Player, ActionTable
+
+with open('test.roa') as f:
+    replay = Replay(f.read())
+    game_version = replay.version
+    match_duration = replay.duration
+    players = replay.players
+    states = players[0].state_table
+    x = states.get(100)
 ```
 
 # Credits
