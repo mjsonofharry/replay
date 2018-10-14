@@ -1,6 +1,6 @@
 import datetime as dt
 import pytest
-from test_common import ReplayData, Stage, StageType, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA
+from test_common import ReplayData, Replay, Stage, StageType, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA
 
 
 class TestReplayData:
@@ -64,10 +64,10 @@ class TestReplayData:
         assert len(players) == 1
         assert players[0] == SAMPLE_PLAYER_DATA
 
-    def test_get_frame_data_all_players(self):
-        actions_all_players = ReplayData.get_frame_data_all_players(SAMPLE_REPLAY_DATA)
-        assert len(actions_all_players) == 1
-        actions_p1 = actions_all_players[0]
+    def test_get_all_frame_data(self):
+        all_actions = ReplayData.get_all_frame_data(SAMPLE_REPLAY_DATA)
+        assert len(all_actions) == 1
+        actions_p1 = all_actions[0]
         assert len(actions_p1) == 717
         assert actions_p1[0] == '1Z'
         assert actions_p1[1] == '101zy327R'
@@ -79,4 +79,50 @@ class TestReplayData:
         assert actions_p1[714] == '2366zD'
 
     def test_get_duration(self):
-        assert ReplayData.get_duration(ReplayData.get_frame_data_all_players(SAMPLE_REPLAY_DATA)) == 2385
+        assert ReplayData.get_duration(ReplayData.get_all_frame_data(SAMPLE_REPLAY_DATA)) == 2385
+
+
+class TestReplay:
+
+    @pytest.fixture
+    def replay(self):
+        return Replay(SAMPLE_REPLAY_DATA)
+
+    def test_player_data(self, replay):
+        assert replay._player_data == ReplayData.get_player_data(SAMPLE_REPLAY_DATA)
+
+    def test_is_starred(self, replay):
+        assert replay.is_starred == ReplayData.is_starred(SAMPLE_REPLAY_DATA)
+
+    def test_version(self, replay):
+        assert replay.version == ReplayData.get_version(SAMPLE_REPLAY_DATA)
+
+    def test_date(self, replay):
+        assert replay.date == ReplayData.get_date(SAMPLE_REPLAY_DATA)
+
+    def test_name(self, replay):
+        assert replay.name == ReplayData.get_name(SAMPLE_REPLAY_DATA)
+
+    def test_description(self, replay):
+        assert replay.description == ReplayData.get_description(SAMPLE_REPLAY_DATA)
+
+    def test_stage_type(self, replay):
+        assert replay.stage_type == ReplayData.get_stage_type(SAMPLE_REPLAY_DATA)
+    
+    def test_stock(self, replay):
+        assert replay.stock == ReplayData.get_stock(SAMPLE_REPLAY_DATA)
+
+    def test_time(self, replay):
+        assert replay.time == ReplayData.get_time(SAMPLE_REPLAY_DATA)
+
+    def test_is_teams_enabled(self, replay):
+        assert replay.is_teams_enabled == ReplayData.is_teams_enabled(SAMPLE_REPLAY_DATA)
+
+    def test_is_friendly_fire_enabled(self, replay):
+        assert replay.is_friendly_fire_enabled == ReplayData.is_friendly_fire_enabled(SAMPLE_REPLAY_DATA)
+
+    def test_is_online(self, replay):
+        assert replay.is_online == ReplayData.is_online(SAMPLE_REPLAY_DATA)
+
+    def test_duration(self, replay):
+        assert replay.duration == ReplayData.get_duration(ReplayData.get_all_frame_data(SAMPLE_REPLAY_DATA))

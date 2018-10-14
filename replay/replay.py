@@ -1,7 +1,8 @@
 import datetime
 import enum
+import functools
 import re
-from .player import PlayerData
+from .player import PlayerData, Player
 
 
 class Stage(enum.Enum):
@@ -67,7 +68,7 @@ class ReplayData:
         return replay_data[53:193].rstrip()
     
     @staticmethod
-    def __get_unidentified_metadata_1(replay_data):
+    def _get_unidentified_metadata_1(replay_data):
         return replay_data[194:204]
 
     @staticmethod
@@ -99,7 +100,7 @@ class ReplayData:
         return bool(int(replay_data[214]))
 
     @staticmethod
-    def __get_unidentified_metadata_2(replay_data):
+    def _get_unidentified_metadata_2(replay_data):
         return int(replay_data[215:218]), int(replay_data[218:222])
 
     @classmethod
@@ -107,14 +108,91 @@ class ReplayData:
         return cls.player_pattern.findall(replay_data)
 
     @classmethod
-    def get_frame_data_all_players(cls, replay_data):
+    def get_all_frame_data(cls, replay_data):
         return [
             PlayerData.get_frame_data(x) for x in cls.get_player_data(replay_data)
         ]
 
     @staticmethod
-    def get_duration(frame_data_all_players):
+    def get_duration(all_frame_data):
         return max([
             max([int(re.findall(r'^\d+', x)[0]) for x in frames])
-            for frames in frame_data_all_players
+            for frames in all_frame_data
         ])
+
+
+class Replay:
+
+    def __init__(self, replay_data):
+        self._replay_data = replay_data
+
+    @property
+    @functools.lru_cache(maxsize=32)
+    def _player_data(self):
+        return ReplayData.get_player_data(self._replay_data)
+
+    @property
+    @functools.lru_cache(maxsize=32)
+    def players(self):
+        return [Player(x) for x in self._player_data]
+
+    @property
+    def is_starred(self):
+        return ReplayData.is_starred(self._replay_data)
+
+    @property
+    def version(self):
+        return ReplayData.get_version(self._replay_data)
+
+    @property
+    def date(self):
+        return ReplayData.get_date(self._replay_data)
+    
+    @property
+    def name(self):
+        return ReplayData.get_name(self._replay_data)
+    
+    @property
+    def description(self):
+        return ReplayData.get_description(self._replay_data)
+    
+    @property
+    def _unknown_1(self):
+        return ReplayData._get_unidentified_metadata_1(self._replay_data)
+
+    @property
+    def stage_type(self):
+        return ReplayData.get_stage_type(self._replay_data)
+    
+    @property
+    def stage(self):
+        return ReplayData.get_stage(self._replay_data)
+
+    @property
+    def stock(self):
+        return ReplayData.get_stock(self._replay_data)
+    
+    @property
+    def time(self):
+        return ReplayData.get_time(self._replay_data)
+
+    @property
+    def is_teams_enabled(self):
+        return ReplayData.is_teams_enabled(self._replay_data)
+    
+    @property
+    def is_friendly_fire_enabled(self):
+        return ReplayData.is_friendly_fire_enabled(self._replay_data)
+    
+    @property
+    def is_online(self):
+        return ReplayData.is_online(self._replay_data)
+
+    @property
+    def _unknown_2(self):
+        return ReplayData._get_unidentified_metadata_2(self._replay_data)
+
+    @property
+    @functools.lru_cache(maxsize=32)
+    def duration(self):
+        return ReplayData.get_duration([x._frame_data for x in self.players])

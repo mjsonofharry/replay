@@ -257,3 +257,14 @@ class FrameData:
         if result == 360:
             return 0
         return result
+
+
+class ActionTable:
+
+    def __init__(self, table):
+        self._table = table
+
+    def get(self, key, snapping=True):
+        if snapping:
+            key = FrameData.snap_frame(self._table, key)
+        return self._table[key]

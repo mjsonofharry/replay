@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from replay import ReplayData, PlayerData, FrameData, ActionType, Action, Character, StageType, Stage
+from replay import ReplayData, PlayerData, FrameData, ActionTable, Replay, Player, ActionType, Action, Character, StageType, Stage
 import pytest
 
 SAMPLE_REPLAY_DATA = '''001030521211831072018SAMPLE REPLAY                   This is a replay I recorded to use as a sample in my replay parser.                                                                         0000022740
