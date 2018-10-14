@@ -1,6 +1,66 @@
 import bisect
+import enum
 import re
-from .utilities import ActionType, Action
+
+class Action(enum.Enum):
+    INVALID = -1
+    JUMP_PRESS = 0
+    JUMP_RELEASE = 1
+    ATTACK_PRESS = 2
+    ATTACK_RELEASE = 3
+    SPECIAL_PRESS = 4
+    SPECIAL_RELEASE = 5
+    STRONG_PRESS = 6
+    STRONG_RELEASE = 7
+    STRONG_LEFT_PRESS = 8
+    STRONG_LEFT_RELEASE = 9
+    STRONG_RIGHT_PRESS = 10
+    STRONG_RIGHT_RELEASE = 11
+    STRONG_UP_PRESS = 12
+    STRONG_UP_RELEASE = 13
+    STRONG_DOWN_PRESS = 14
+    STRONG_DOWN_RELEASE = 15
+    DODGE_PRESS = 16
+    DODGE_RELEASE = 17
+    UP_PRESS = 18
+    UP_RELEASE = 19
+    UP_TAP = 20
+    DOWN_PRESS = 21
+    DOWN_RELEASE = 22
+    DOWN_TAP = 23
+    LEFT_PRESS = 24
+    LEFT_RELEASE = 25
+    LEFT_TAP = 26
+    RIGHT_PRESS = 27
+    RIGHT_RELEASE = 28
+    RIGHT_TAP = 29
+    ANGLES_ENABLED = 30
+    ANGLES_DISABLED = 31
+
+class ActionType(enum.IntEnum):
+    INVALID = -1
+    JUMP = 0
+    ATTACK = 1
+    SPECIAL = 2
+    STRONG = 3
+    STRONG_LEFT = 4
+    STRONG_RIGHT = 5
+    STRONG_UP = 6
+    STRONG_DOWN = 7
+    DODGE = 8
+    UP = 9
+    DOWN = 10
+    LEFT = 11
+    RIGHT = 12
+    ANGLES = 13
+    ANGLE_UP = 14
+    ANGLE_DOWN = 15
+    ANGLE_LEFT = 16
+    ANGLE_RIGHT = 17
+    TAP_UP = 18
+    TAP_DOWN = 19
+    TAP_LEFT = 20
+    TAP_RIGHT = 21
 
 class FrameData:
     action_regex = r'(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})'

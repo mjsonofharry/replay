@@ -1,5 +1,21 @@
+import enum
 import re
-from .utilities import Character
+
+class Character(enum.Enum):
+    INVALID = -1
+    ERROR_1 = 0
+    ERROR_2 = 1
+    ZETTERBURN = 2
+    ORCANE = 3
+    WRASTOR = 4
+    KRAGG = 5
+    FORSBURN = 6
+    MAYPUL = 7
+    ABSA = 8
+    ETALUS = 9
+    ORI = 10
+    RANNO = 11
+    CLAIREN = 12
 
 class PlayerData:
     frame_regex= r'(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)'
