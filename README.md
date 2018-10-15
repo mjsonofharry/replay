@@ -77,7 +77,7 @@ from replay import FrameData, PlayerData, ReplayData
 with open('test.roa') as f:
     replay_data = f.read()
     game_version = ReplayData.get_version(replay_data)
-    match_duration = ReplayData.get_duration(ReplayData.test_get_all_frame_data(replay_data))
+    match_duration = ReplayData.get_duration(ReplayData.get_all_frame_data(replay_data))
     player_data = ReplayData.get_player_data(replay_data)
     state_table = FrameData.get_state_table(PlayerData.get_frame_data(player_data[0]))
     x = state_table[FrameData.snap_frame(100)]
