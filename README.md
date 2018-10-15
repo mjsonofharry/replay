@@ -65,7 +65,7 @@ Angles are treated differently by lookup tables and state tables. The former lea
 
 Replay and Player objects can be used instead of the aforementioned ReplayData and PlayerData static classes in order to accomodate an object-oriented coding style (see below for an example). They use LRU caching to provide lazy evaluation for some of their more demanding attributes (e.g. for state tables). Otherwise, implementation details are unchanged. 
 
-Lookup tables are generic wrappers for both action and state tables. The _get_ method of an action table provides automatic snapping. Thus, whereas the PlayerData static class returns a collection which can be used to generate a state or action table, a Player object simply returns an lookup table of the requested type.
+Lookup tables are generic wrappers for both action and state tables. The _get_ method of a lookup table provides automatic snapping. Thus, whereas the PlayerData static class returns a collection which can be used to generate a state or action table, a Player object simply returns an lookup table of the requested type.
 
 # Example
 
