@@ -80,7 +80,7 @@ Replay and Player objects can be used instead of the aforementioned ReplayData a
 
 Lookup tables are generic wrappers for both action and state tables. The _get_ method of a lookup table provides automatic snapping. Thus, whereas the PlayerData static class returns a collection which can be used to generate a state or action table, a Player object simply returns an lookup table of the requested type.
 
-# Example
+# Examples
 
 ## Functional Style
 
