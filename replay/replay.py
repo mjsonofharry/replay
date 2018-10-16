@@ -44,7 +44,7 @@ class ReplayData:
 
     @staticmethod
     def is_starred(replay_data):
-        return replay_data[0] == 1
+        return bool(int(replay_data[0]))
 
     @staticmethod
     def get_version(replay_data):

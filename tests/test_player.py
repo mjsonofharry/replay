@@ -1,5 +1,5 @@
 import pytest
-from test_common import PlayerData, Player, Character, SAMPLE_PLAYER_DATA
+from test_common import PlayerData, Player, Character, SAMPLE_PLAYER_DATA, ALT_SAMPLE_PLAYER_DATA
 
 
 class TestPlayerData:
@@ -15,6 +15,9 @@ class TestPlayerData:
 
     def test_get_character(self):
         assert PlayerData.get_character(SAMPLE_PLAYER_DATA) == Character.ORI
+
+    def test_get_character_alt(self):
+        assert PlayerData.get_character(ALT_SAMPLE_PLAYER_DATA[1]) == Character.ABSA
 
     def test_get_frame_data(self):
         actions_p1 = PlayerData.get_frame_data(SAMPLE_PLAYER_DATA)

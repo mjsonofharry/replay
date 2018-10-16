@@ -1,13 +1,12 @@
 import datetime as dt
 import pytest
-from test_common import ReplayData, Replay, Stage, StageType, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA
+from test_common import ReplayData, Replay, Stage, StageType, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA, ALT_SAMPLE_REPLAY_DATA, ALT_SAMPLE_PLAYER_DATA
 
 
 class TestReplayData:
     
-    @pytest.mark.skip
     def test_is_starred_true(self):
-        pytest.fail('Test case not covered')
+        assert ReplayData.is_starred(ALT_SAMPLE_REPLAY_DATA) == True
 
     def test_is_starred_false(self):
         assert ReplayData.is_starred(SAMPLE_REPLAY_DATA) == False
@@ -41,9 +40,8 @@ class TestReplayData:
     def test_is_teams_enabled_true(self):
         assert ReplayData.is_teams_enabled(SAMPLE_REPLAY_DATA) == False
     
-    @pytest.mark.skip
     def test_is_teams_enabled_false(self):
-        pytest.fail('Test case not covered')
+        assert ReplayData.is_teams_enabled(ALT_SAMPLE_REPLAY_DATA)
 
     def test_is_friendly_fire_enabled_true(self):
         assert ReplayData.is_friendly_fire_enabled(SAMPLE_REPLAY_DATA) == False
@@ -64,6 +62,12 @@ class TestReplayData:
         assert len(players) == 1
         assert players[0] == SAMPLE_PLAYER_DATA
 
+    def test_get_player_data_multiplayer(self):
+        players = ReplayData.get_player_data(ALT_SAMPLE_REPLAY_DATA)
+        assert len(players) == 2
+        assert players[0] == ALT_SAMPLE_PLAYER_DATA[0]
+        assert players[1] == ALT_SAMPLE_PLAYER_DATA[1]
+
     def test_get_all_frame_data(self):
         all_actions = ReplayData.get_all_frame_data(SAMPLE_REPLAY_DATA)
         assert len(all_actions) == 1
@@ -80,6 +84,9 @@ class TestReplayData:
 
     def test_get_duration(self):
         assert ReplayData.get_duration(ReplayData.get_all_frame_data(SAMPLE_REPLAY_DATA)) == 2385
+
+    def test_get_duration_multiplayer(self):
+        assert ReplayData.get_duration(ReplayData.get_all_frame_data(ALT_SAMPLE_REPLAY_DATA)) == 2208
 
 
 class TestReplay:
