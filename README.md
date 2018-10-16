@@ -50,7 +50,7 @@ The frame data shown above can then be transformed into either a state table or 
 
 ## Action table
 
-A dictionary representation of frame data, in which the keys are frame numbers and the values are the player's inputs.
+A dictionary representation of frame data, in which the keys are frame numbers and the values are actions. Actions, which are Enums, represent possible player inputs, such as JUMP_PRESS, JUMP_RELEASE, LEFT_PRESS, LEFT_TAP, LEFT_RELEASE, STRONG_PRESS, STRONG_RELEASE, etcetera. Angles are not converted into actions, and are instead left as normal integers (e.g. 180, 233, 47, etc) to preserve accuracy.
 
 ```
 player1_lookup[1293] == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
@@ -66,13 +66,7 @@ A more complicated variation of the action table, in which the keys are frame nu
 player1_state_lookup[101] == [False, False, False, False, False, False, False, False, False, False, False, False, True, False, False, True, False, True]
 ```
 
-The Boolean flag indices correspond with ActionTypes.
-
-## Action and ActionType
-
-Actions, which are used by action tables, represent possible player inputs, such as JUMP_PRESS, JUMP_RELEASE, LEFT_PRESS, LEFT_TAP, LEFT_RELEASE, STRONG_PRESS, STRONG_RELEASE, etcetera. ActionTypes, which are used by state tables, condense Actions into classes like JUMP, LEFT, STRONG, etcetera. Actions are Enums and ActionTypes are IntEnums.
-
-Angles are treated differently by lookup tables and state tables. The former leaves them as normal integers (e.g. 180, 233, 47, etc), while the latter rounds them to the nearest 45 degree increment and then converts them into ANGLE_UP, ANGLE_DOWN, ANGLE_LEFT, ANGLE_RIGHT, or any pair of those that represents a diagonal.
+The Boolean flag indices correspond with ActionTypes. ActionTypes, which are IntEnums, condense Actions into classes like JUMP, LEFT, STRONG, etcetera. Angles are rounded to the nearest 45 degree increment and then converted into ANGLE_UP, ANGLE_DOWN, ANGLE_LEFT, ANGLE_RIGHT, or any pair of those that represents a diagonal.
 
 ## (Optional) Replay, Player, and LookupTable
 
