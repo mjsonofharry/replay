@@ -86,7 +86,7 @@ with open('test.roa') as f:
 ## Object-Oriented Style
 
 ```
-from replay import Replay, Player, ActionTable
+from replay import Replay, Player
 
 with open('test.roa') as f:
     replay = Replay(f.read())
