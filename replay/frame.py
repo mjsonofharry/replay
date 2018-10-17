@@ -56,7 +56,7 @@ class ActionType(enum.IntEnum):
     DOWN = 10
     LEFT = 11
     RIGHT = 12
-    ANGLES = 13
+    ANGLES_ENABLED = 13
     ANGLE_UP = 14
     ANGLE_DOWN = 15
     ANGLE_LEFT = 16
@@ -65,6 +65,7 @@ class ActionType(enum.IntEnum):
     TAP_DOWN = 19
     TAP_LEFT = 20
     TAP_RIGHT = 21
+    ANGLE = 22
 
 
 class FrameData:
@@ -172,8 +173,8 @@ class FrameData:
         Action.RIGHT_PRESS: ActionType.RIGHT,
         Action.RIGHT_RELEASE: ActionType.RIGHT,
         Action.RIGHT_TAP: ActionType.RIGHT,
-        Action.ANGLES_ENABLED: ActionType.ANGLES,
-        Action.ANGLES_DISABLED: ActionType.ANGLES,
+        Action.ANGLES_ENABLED: ActionType.ANGLES_ENABLED,
+        Action.ANGLES_DISABLED: ActionType.ANGLES_ENABLED,
     }
     angle_to_action_type = {
         0: (ActionType.ANGLE_RIGHT,),
@@ -218,9 +219,10 @@ class FrameData:
     @classmethod
     def get_state_table(cls, frame_data):
         table = {}
-        state = [False]*22
+        state = [False]*22 + [-1]
         for x in cls.split_frames_into_tokens(frame_data):
-            state[ActionType.ANGLE_UP:] = [False]*8
+            state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
+            state[ActionType.ANGLE] = -1
             n = int(x[0])
             tokens = x[1:]
             actions = cls.convert_multiple_tokens_to_actions(tokens)
@@ -230,6 +232,7 @@ class FrameData:
                 else:
                     for x in cls.angle_to_action_type[cls.snap_angle(a)]:
                         state[x] = True
+                    state[ActionType.ANGLE] = a
             table[n] = list(state)
         return table
 

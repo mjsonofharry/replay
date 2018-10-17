@@ -60,23 +60,30 @@ class TestFrameData:
 
     def test_get_state_table(self):
         state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        state = [False]*22
-        state[ActionType.ANGLES] = True
+        state = [False]*22 + [-1]
+        state[ActionType.ANGLES_ENABLED] = True
         assert state_p1[1] == state
-        state[ActionType.ANGLES] = False
+
+        state[ActionType.ANGLES_ENABLED] = False
         state[ActionType.ANGLE_RIGHT] = True
         state[ActionType.ANGLE_DOWN] = True
         state[ActionType.RIGHT] = True
+        state[ActionType.ANGLE] = 327
         assert state_p1[101] == state
-        state[-8:] = [False]*8
+
+        state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
+        state[ActionType.ANGLE] = -1
         state[ActionType.ANGLE_RIGHT] = False
         state[ActionType.STRONG] = True
         assert state_p1[148] == state
-        state[-8:] = [False]*8
-        state[ActionType.ANGLES] = True
+
+        state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
+        state[ActionType.ANGLE] = -1
+        state[ActionType.ANGLES_ENABLED] = True
         state[ActionType.ANGLE_RIGHT] = True
         state[ActionType.RIGHT] = False
         state[ActionType.STRONG] = False
+        state[ActionType.ANGLE] = 0
         assert state_p1[154] == state
 
     def test_snap_frame(self, action_table):
