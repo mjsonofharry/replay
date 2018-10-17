@@ -60,7 +60,7 @@ class TestFrameData:
 
     def test_get_state_table(self):
         state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        state = [False]*18
+        state = [False]*22
         state[ActionType.ANGLES] = True
         assert state_p1[1] == state
         state[ActionType.ANGLES] = False

@@ -218,9 +218,9 @@ class FrameData:
     @classmethod
     def get_state_table(cls, frame_data):
         table = {}
-        state = [False]*18
+        state = [False]*22
         for x in cls.split_frames_into_tokens(frame_data):
-            state[-8:] = [False]*8
+            state[ActionType.ANGLE_UP:] = [False]*8
             n = int(x[0])
             tokens = x[1:]
             actions = cls.convert_multiple_tokens_to_actions(tokens)
