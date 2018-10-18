@@ -15,22 +15,22 @@ def raw_action_table():
 class TestFrameData:
     
     def test_convert_token_to_action(self):
-        assert FrameData.convert_token_to_action('Z') == Action.ANGLES_ENABLED
-        assert FrameData.convert_token_to_action('y327') == 327
-        assert FrameData.convert_token_to_action('R') == Action.RIGHT_PRESS
+        assert FrameData._convert_token_to_action('Z') == Action.ANGLES_ENABLED
+        assert FrameData._convert_token_to_action('y327') == 327
+        assert FrameData._convert_token_to_action('R') == Action.RIGHT_PRESS
 
     def test_convert_multiple_tokens_to_actions(self):
-        assert FrameData.convert_multiple_tokens_to_actions(['Z']) == [Action.ANGLES_ENABLED]
-        assert FrameData.convert_multiple_tokens_to_actions(['z', 'y327', 'R']) == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
-        assert FrameData.convert_multiple_tokens_to_actions(['C']) == [Action.STRONG_PRESS]
-        assert FrameData.convert_multiple_tokens_to_actions(['Z', 'y  0', 'r', 'c']) == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
-        assert FrameData.convert_multiple_tokens_to_actions(['z', 'y143', 'L', 'U']) == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
-        assert FrameData.convert_multiple_tokens_to_actions(['y  0']) == [0]
-        assert FrameData.convert_multiple_tokens_to_actions(['Z', 'y180', 'd']) == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
-        assert FrameData.convert_multiple_tokens_to_actions(['z', 'D']) == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['Z']) == [Action.ANGLES_ENABLED]
+        assert FrameData._convert_multiple_tokens_to_actions(['z', 'y327', 'R']) == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['C']) == [Action.STRONG_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['Z', 'y  0', 'r', 'c']) == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
+        assert FrameData._convert_multiple_tokens_to_actions(['z', 'y143', 'L', 'U']) == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['y  0']) == [0]
+        assert FrameData._convert_multiple_tokens_to_actions(['Z', 'y180', 'd']) == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
+        assert FrameData._convert_multiple_tokens_to_actions(['z', 'D']) == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
 
     def test_split_frames_into_tokens(self):
-        split_frames = FrameData.split_frames_into_tokens(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+        split_frames = FrameData._split_frames_into_tokens(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
         assert split_frames[0] == ['1', 'Z']
         assert split_frames[1] == ['101', 'z', 'y327', 'R']
         assert split_frames[-2] == ['2384', 'Z', 'y180', 'd']
@@ -61,23 +61,19 @@ class TestFrameData:
     def test_get_state_table(self):
         state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
         state = [False]*22 + [-1]
-
         state[ActionType.ANGLES_ENABLED] = True
         assert state_p1[1] == state
-
         state[ActionType.ANGLES_ENABLED] = False
         state[ActionType.ANGLE_RIGHT] = True
         state[ActionType.ANGLE_DOWN] = True
         state[ActionType.RIGHT] = True
         state[ActionType.ANGLE] = 327
         assert state_p1[101] == state
-
         state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
         state[ActionType.ANGLE] = -1
         state[ActionType.ANGLE_RIGHT] = False
         state[ActionType.STRONG] = True
         assert state_p1[148] == state
-
         state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
         state[ActionType.ANGLE] = -1
         state[ActionType.ANGLES_ENABLED] = True

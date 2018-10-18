@@ -189,18 +189,18 @@ class FrameData:
     }
 
     @classmethod
-    def convert_token_to_action(cls, t):
+    def _convert_token_to_action(cls, t):
         if t[0] == 'y':
             return int(t[1:])
         else:
             return cls.token_to_action.get(t, Action.INVALID)
     
     @classmethod
-    def convert_multiple_tokens_to_actions(cls, ts):
-        return [cls.convert_token_to_action(t) for t in ts]
+    def _convert_multiple_tokens_to_actions(cls, ts):
+        return [cls._convert_token_to_action(t) for t in ts]
 
     @classmethod
-    def split_frames_into_tokens(cls, frame_data):
+    def _split_frames_into_tokens(cls, frame_data):
         return [
             [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
             for x in frame_data
@@ -211,21 +211,21 @@ class FrameData:
         return {
             int(x[0]): (
                 x[1:] if raw 
-                else cls.convert_multiple_tokens_to_actions(x[1:])
+                else cls._convert_multiple_tokens_to_actions(x[1:])
             )
-            for x in cls.split_frames_into_tokens(frame_data)
+            for x in cls._split_frames_into_tokens(frame_data)
         }
 
     @classmethod
     def get_state_table(cls, frame_data):
         table = {}
         state = [False]*22 + [-1]
-        for x in cls.split_frames_into_tokens(frame_data):
+        for x in cls._split_frames_into_tokens(frame_data):
             state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
             state[ActionType.ANGLE] = -1
             n = int(x[0])
             tokens = x[1:]
-            actions = cls.convert_multiple_tokens_to_actions(tokens)
+            actions = cls._convert_multiple_tokens_to_actions(tokens)
             for a in actions:
                 if isinstance(a, Action):
                     state[cls.action_to_action_type[a]] = cls.action_to_boolean[a]
