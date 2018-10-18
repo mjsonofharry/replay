@@ -16,7 +16,7 @@ class Rect:
         self.size = (self.width, self.height)
 
 
-class Game:
+class GameWindow:
 
     def __init__(self):
         self._hwnd = win32gui.FindWindow(None, TITLE)
@@ -44,3 +44,4 @@ class Game:
             self._hwnd,
             rect._x0, rect._y0, *size,
             True)
+
