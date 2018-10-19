@@ -1,8 +1,10 @@
+import functools
 import win32gui
 
-TITLE = 'Rivals of Aether'
+CORNER = (-8, -31)
 DEFAULT_WIDTH = 976
 DEFAULT_HEIGHT = 579
+TITLE = 'Rivals of Aether'
 
 
 class Rect:
@@ -15,33 +17,38 @@ class Rect:
         self.height = self._y1 - self._y0
         self.size = (self.width, self.height)
 
-
+win32gui.GetDesktopWindow
 class GameWindow:
 
     def __init__(self):
         self._hwnd = win32gui.FindWindow(None, TITLE)
 
-    def get_rect(self):
-        return Rect(win32gui.GetWindowRect(self._hwnd))
+    def _get_rect(self, client=False):
+        if not client:
+            return Rect(win32gui.GetWindowRect(self._hwnd))
+        else:
+            return Rect(win32gui.GetClientRect(self._hwnd))
 
     def focus(self):
         win32gui.SetForegroundWindow(self._hwnd)
 
-    def translate(self, position=None):
-        if not position:
-            position = (0, 0)
-        rect = self.get_rect()
+    def translate(self, position):
+        rect = self._get_rect()
         win32gui.MoveWindow(
             self._hwnd,
             *position, rect.width, rect.height,
             True)
 
-    def scale(self, size=None):
-        if not size:
-            size = (DEFAULT_WIDTH, DEFAULT_HEIGHT)
-        rect = self.get_rect()
+    def move_to_corner(self):
+        rect = self._get_rect()
+        x = rect._x0
+        y = rect._y0
+        dx, dy = win32gui.ScreenToClient(self._hwnd, (0, 0))
+        self.translate((x + dx, y + dy))
+
+    def scale(self, size):
+        rect = self._get_rect()
         win32gui.MoveWindow(
             self._hwnd,
             rect._x0, rect._y0, *size,
             True)
-

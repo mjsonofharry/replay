@@ -6,9 +6,9 @@ import time
 
 class FrameCollector():
 
-    def __init__(self, window_rect):
+    def __init__(self, game_window):
         self._sct = mss.mss()
-        self._target = window_rect
+        self._target = game_window._get_rect(client=True)
 
     def get_frame(self):
         return self._sct.grab({
