@@ -24,10 +24,9 @@ class GameWindow:
         self._hwnd = win32gui.FindWindow(None, TITLE)
 
     def _get_rect(self, client=False):
-        if not client:
-            return Rect(win32gui.GetWindowRect(self._hwnd))
-        else:
-            return Rect(win32gui.GetClientRect(self._hwnd))
+        return Rect(
+            (win32gui.GetWindowRect if not client
+            else win32gui.GetClientRect)(self._hwnd))
 
     def focus(self):
         win32gui.SetForegroundWindow(self._hwnd)
