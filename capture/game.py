@@ -17,7 +17,7 @@ class Rect:
         self.height = self._y1 - self._y0
         self.size = (self.width, self.height)
 
-win32gui.GetDesktopWindow
+
 class GameWindow:
 
     def __init__(self):
