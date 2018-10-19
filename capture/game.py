@@ -41,10 +41,8 @@ class GameWindow:
 
     def move_to_corner(self):
         rect = self._get_rect()
-        x = rect._x0
-        y = rect._y0
-        dx, dy = win32gui.ScreenToClient(self._hwnd, (0, 0))
-        self.translate((x + dx, y + dy))
+        x, y = win32gui.ScreenToClient(self._hwnd, (0, 0))
+        self.translate((rect._x0 + x, rect._y0 + y))
 
     def scale(self, size):
         rect = self._get_rect()
