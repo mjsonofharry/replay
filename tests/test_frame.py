@@ -1,15 +1,15 @@
-from test_common import ReplayData, PlayerData, FrameData, LookupTable, Action, ActionType, SAMPLE_PLAYER_DATA
+from test_common import ReplayData, PlayerData, FrameData, Action, StateKey, SAMPLE_PLAYER_DATA
 import pytest
 
 
 @pytest.fixture
 def action_table():
-    return FrameData.get_action_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+    return FrameData.get_action_map(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
 
 
 @pytest.fixture
 def raw_action_table():
-    return FrameData.get_action_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
+    return FrameData.get_action_map(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
 
 
 class TestFrameData:
@@ -60,28 +60,53 @@ class TestFrameData:
 
     def test_get_state_table(self):
         state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
-        state = [False]*22 + [-1]
-        state[ActionType.ANGLES_ENABLED] = True
+        state = {
+            StateKey.FRAME: 1,
+            StateKey.JUMP: False,
+            StateKey.ATTACK: False,
+            StateKey.SPECIAL: False,
+            StateKey.STRONG: False,
+            StateKey.STRONG_LEFT: False,
+            StateKey.STRONG_RIGHT: False,
+            StateKey.STRONG_UP: False,
+            StateKey.STRONG_DOWN: False,
+            StateKey.DODGE: False,
+            StateKey.UP: False,
+            StateKey.DOWN: False,
+            StateKey.LEFT: False,
+            StateKey.RIGHT: False,
+            StateKey.TAP_UP: False,
+            StateKey.TAP_DOWN: False,
+            StateKey.TAP_LEFT: False,
+            StateKey.TAP_RIGHT: False,
+            StateKey.ANGLES_ENABLED: True,
+            StateKey.ANGLE: None
+        }
+        assert state_p1[0] == state
+        state[StateKey.FRAME] = 101
+        state[StateKey.ANGLES_ENABLED] = False
+        state[StateKey.RIGHT] = True
+        state[StateKey.ANGLE] = 327
         assert state_p1[1] == state
-        state[ActionType.ANGLES_ENABLED] = False
-        state[ActionType.ANGLE_RIGHT] = True
-        state[ActionType.ANGLE_DOWN] = True
-        state[ActionType.RIGHT] = True
-        state[ActionType.ANGLE] = 327
-        assert state_p1[101] == state
-        state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
-        state[ActionType.ANGLE] = -1
-        state[ActionType.ANGLE_RIGHT] = False
-        state[ActionType.STRONG] = True
-        assert state_p1[148] == state
-        state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
-        state[ActionType.ANGLE] = -1
-        state[ActionType.ANGLES_ENABLED] = True
-        state[ActionType.ANGLE_RIGHT] = True
-        state[ActionType.RIGHT] = False
-        state[ActionType.STRONG] = False
-        state[ActionType.ANGLE] = 0
-        assert state_p1[154] == state
+        state[StateKey.FRAME] = 102
+        state[StateKey.ANGLE] = 333
+        assert state_p1[2] == state
+        state[StateKey.FRAME] = 103
+        state[StateKey.ANGLE] = 338
+        state[StateKey.TAP_RIGHT] = True
+        assert state_p1[3] == state
+        state[StateKey.FRAME] = 104
+        state[StateKey.ANGLE] = 341
+        assert state_p1[4] == state
+        state[StateKey.FRAME] = 105
+        state[StateKey.ANGLE] = 344
+        state[StateKey.TAP_RIGHT] = False
+        assert state_p1[5] == state
+        state[StateKey.FRAME] = 106
+        state[StateKey.ANGLE] = 345
+        state[StateKey.TAP_RIGHT] = False
+        assert state_p1[6] == state
+
 
     def test_snap_frame(self, action_table):
         assert FrameData.snap_frame(action_table, 1) == 1

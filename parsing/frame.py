@@ -1,5 +1,6 @@
 import bisect
 import enum
+import functools
 import re
 
 
@@ -74,41 +75,6 @@ class Action:
         'z': ANGLES_DISABLED
     }
 
-    to_boolean = {
-        JUMP_PRESS: True,
-        JUMP_RELEASE: False,
-        ATTACK_PRESS: True,
-        ATTACK_RELEASE: False,
-        SPECIAL_PRESS: True,
-        SPECIAL_RELEASE: False,
-        STRONG_PRESS: True,
-        STRONG_RELEASE: False,
-        STRONG_LEFT_PRESS: True,
-        STRONG_LEFT_RELEASE: False,
-        STRONG_RIGHT_PRESS: True,
-        STRONG_RIGHT_RELEASE: False,
-        STRONG_UP_PRESS: True,
-        STRONG_UP_RELEASE: False,
-        STRONG_DOWN_PRESS: True,
-        STRONG_DOWN_RELEASE: False,
-        DODGE_PRESS: True,
-        DODGE_RELEASE: False,
-        UP_PRESS: True,
-        UP_RELEASE: False,
-        UP_TAP: True,
-        DOWN_PRESS: True,
-        DOWN_RELEASE: False,
-        DOWN_TAP: True,
-        LEFT_PRESS: True,
-        LEFT_RELEASE: False,
-        LEFT_TAP: True,
-        RIGHT_PRESS: True,
-        RIGHT_RELEASE: False,
-        RIGHT_TAP: True,
-        ANGLES_ENABLED: True,
-        ANGLES_DISABLED: False
-    }
-
 
 class StateKey:
 
@@ -133,41 +99,39 @@ class StateKey:
     ANGLES_ENABLED = "Angles Enabled"
     ANGLE = "Angle"
 
-    # TODO: Return a tuple and remove Action.to_boolean
     from_action = {
-        Action.JUMP_PRESS: JUMP,
-        Action.JUMP_RELEASE: JUMP,
-        Action.ATTACK_PRESS: ATTACK,
-        Action.ATTACK_RELEASE: ATTACK,
-        Action.SPECIAL_PRESS: SPECIAL,
-        Action.SPECIAL_RELEASE: SPECIAL,
-        Action.STRONG_PRESS: STRONG,
-        Action.STRONG_RELEASE: STRONG,
-        Action.STRONG_LEFT_PRESS: STRONG_LEFT,
-        Action.STRONG_LEFT_RELEASE: STRONG_LEFT,
-        Action.STRONG_RIGHT_PRESS: STRONG_RIGHT,
-        Action.STRONG_RIGHT_RELEASE: STRONG_RIGHT,
-        Action.STRONG_UP_PRESS: STRONG_UP,
-        Action.STRONG_UP_RELEASE: STRONG_UP,
-        Action.STRONG_DOWN_PRESS: STRONG_DOWN,
-        Action.STRONG_DOWN_RELEASE: STRONG_DOWN,
-        Action.DODGE_PRESS: DODGE,
-        Action.DODGE_RELEASE: DODGE,
-        Action.UP_PRESS: UP,
-        Action.UP_RELEASE: UP,
-        Action.UP_TAP: UP,
-        Action.UP_TAP: UP,
-        Action.DOWN_PRESS: DOWN,
-        Action.DOWN_RELEASE: DOWN,
-        Action.DOWN_TAP: DOWN,
-        Action.LEFT_PRESS: LEFT,
-        Action.LEFT_RELEASE: LEFT,
-        Action.LEFT_TAP: LEFT,
-        Action.RIGHT_PRESS: RIGHT,
-        Action.RIGHT_RELEASE: RIGHT,
-        Action.RIGHT_TAP: RIGHT,
-        Action.ANGLES_ENABLED: ANGLES_ENABLED,
-        Action.ANGLES_DISABLED: ANGLES_ENABLED,
+        Action.JUMP_PRESS: (True, JUMP),
+        Action.JUMP_RELEASE: (False, JUMP),
+        Action.ATTACK_PRESS: (True, ATTACK),
+        Action.ATTACK_RELEASE: (False, ATTACK),
+        Action.SPECIAL_PRESS: (True, SPECIAL),
+        Action.SPECIAL_RELEASE: (False, SPECIAL),
+        Action.STRONG_PRESS: (True, STRONG),
+        Action.STRONG_RELEASE: (False, STRONG),
+        Action.STRONG_LEFT_PRESS: (True, STRONG_LEFT),
+        Action.STRONG_LEFT_RELEASE: (False, STRONG_LEFT),
+        Action.STRONG_RIGHT_PRESS: (True, STRONG_RIGHT),
+        Action.STRONG_RIGHT_RELEASE: (False, STRONG_RIGHT),
+        Action.STRONG_UP_PRESS: (True, STRONG_UP),
+        Action.STRONG_UP_RELEASE: (False, STRONG_UP),
+        Action.STRONG_DOWN_PRESS: (True, STRONG_DOWN),
+        Action.STRONG_DOWN_RELEASE: (False, STRONG_DOWN),
+        Action.DODGE_PRESS: (True, DODGE),
+        Action.DODGE_RELEASE: (False, DODGE),
+        Action.UP_PRESS: (True, UP),
+        Action.UP_RELEASE: (False, UP),
+        Action.UP_TAP: (True, TAP_UP),
+        Action.DOWN_PRESS: (True, DOWN),
+        Action.DOWN_RELEASE: (False, DOWN),
+        Action.DOWN_TAP: (True, TAP_DOWN),
+        Action.LEFT_PRESS: (True, LEFT),
+        Action.LEFT_RELEASE: (False, LEFT),
+        Action.LEFT_TAP: (True, TAP_LEFT),
+        Action.RIGHT_PRESS: (True, RIGHT),
+        Action.RIGHT_RELEASE: (False, RIGHT),
+        Action.RIGHT_TAP: (True, TAP_RIGHT),
+        Action.ANGLES_ENABLED: (True, ANGLES_ENABLED),
+        Action.ANGLES_DISABLED: (False, ANGLES_ENABLED)
     }
 
 
@@ -233,14 +197,19 @@ class FrameData:
 
         for current_frame in cls._split_frames_into_tokens(frame_data):
             state[StateKey.ANGLE] = None
+            state[StateKey.TAP_UP] = False
+            state[StateKey.TAP_DOWN] = False
+            state[StateKey.TAP_LEFT] = False
+            state[StateKey.TAP_RIGHT] = False
             state[StateKey.FRAME] = int(current_frame[0])
             tokens = current_frame[1:]
-            actions = cls._convert_multiple_tokens_to_actions(tokens)
-            for a in actions:
-                if isinstance(a, str):
-                    state[StateKey.from_action[a]] = Action.to_boolean[a]
+            all_actions = cls._convert_multiple_tokens_to_actions(tokens)
+            for action in all_actions:
+                if isinstance(action, str):
+                    isPressed, stateKey = StateKey.from_action[action]
+                    state[stateKey] = isPressed
                 else:
-                    state[StateKey.ANGLE] = a
+                    state[StateKey.ANGLE] = action
             table.append(dict(state))
         return table
 
