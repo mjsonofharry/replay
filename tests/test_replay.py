@@ -133,3 +133,9 @@ class TestReplay:
 
     def test_duration(self, replay):
         assert replay.duration == ReplayData.get_duration(ReplayData.get_all_frame_data(SAMPLE_REPLAY_DATA))
+
+    def test_actions_caching(self, replay):
+        assert id(replay.players[0].actions) == id(replay.actions[0])
+    
+    def test_states_caching(self, replay):
+        assert id(replay.players[0].states == id(replay.states[0]))
