@@ -99,7 +99,7 @@ class StateKey:
     ANGLES_ENABLED = "Angles Enabled"
     ANGLE = "Angle"
 
-    from_action = {
+    _action_map = {
         Action.JUMP_PRESS: (True, JUMP),
         Action.JUMP_RELEASE: (False, JUMP),
         Action.ATTACK_PRESS: (True, ATTACK),
@@ -133,6 +133,12 @@ class StateKey:
         Action.ANGLES_ENABLED: (True, ANGLES_ENABLED),
         Action.ANGLES_DISABLED: (False, ANGLES_ENABLED)
     }
+
+    @classmethod
+    def from_action(cls, a):
+        if isinstance(a, str):
+            return cls._action_map[a]
+        return (a, cls.ANGLE)
 
 
 class FrameData:
@@ -196,20 +202,18 @@ class FrameData:
         }
 
         for current_frame in cls._split_frames_into_tokens(frame_data):
-            state[StateKey.ANGLE] = None
-            state[StateKey.TAP_UP] = False
-            state[StateKey.TAP_DOWN] = False
-            state[StateKey.TAP_LEFT] = False
-            state[StateKey.TAP_RIGHT] = False
-            state[StateKey.FRAME] = int(current_frame[0])
-            tokens = current_frame[1:]
-            all_actions = cls._convert_multiple_tokens_to_actions(tokens)
-            for action in all_actions:
-                if isinstance(action, str):
-                    isPressed, stateKey = StateKey.from_action[action]
-                    state[stateKey] = isPressed
-                else:
-                    state[StateKey.ANGLE] = action
+            state.update({
+                StateKey.FRAME: int(current_frame[0]),
+                StateKey.TAP_UP: False,
+                StateKey.TAP_DOWN: False,
+                StateKey.TAP_LEFT: False,
+                StateKey.TAP_RIGHT: False,
+                StateKey.ANGLE: None
+            })
+            actions = cls._convert_multiple_tokens_to_actions(current_frame[1:])
+            for a in actions:
+                v, sk = StateKey.from_action(a)
+                state[sk] = v
             table.append(dict(state))
         return table
 
