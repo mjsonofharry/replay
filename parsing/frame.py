@@ -1,6 +1,5 @@
 import bisect
 import enum
-import functools
 import re
 
 
