@@ -1,4 +1,3 @@
-import functools
 import win32gui
 
 CORNER = (-8, -31)
