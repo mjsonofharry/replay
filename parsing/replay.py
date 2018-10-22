@@ -137,6 +137,16 @@ class Replay:
         return [Player(x) for x in self._player_data]
 
     @property
+    @functools.lru_cache(maxsize=32)
+    def actions(self):
+        return [x.actions for x in self.players]
+
+    @property
+    @functools.lru_cache(maxsize=32)
+    def states(self):
+        return [x.states for x in self.players]
+
+    @property
     def is_starred(self):
         return ReplayData.is_starred(self._replay_data)
 
