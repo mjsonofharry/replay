@@ -3,197 +3,184 @@ import enum
 import re
 
 
-class Action(enum.Enum):
+class Action:
 
-    INVALID = -1
-    JUMP_PRESS = 0
-    JUMP_RELEASE = 1
-    ATTACK_PRESS = 2
-    ATTACK_RELEASE = 3
-    SPECIAL_PRESS = 4
-    SPECIAL_RELEASE = 5
-    STRONG_PRESS = 6
-    STRONG_RELEASE = 7
-    STRONG_LEFT_PRESS = 8
-    STRONG_LEFT_RELEASE = 9
-    STRONG_RIGHT_PRESS = 10
-    STRONG_RIGHT_RELEASE = 11
-    STRONG_UP_PRESS = 12
-    STRONG_UP_RELEASE = 13
-    STRONG_DOWN_PRESS = 14
-    STRONG_DOWN_RELEASE = 15
-    DODGE_PRESS = 16
-    DODGE_RELEASE = 17
-    UP_PRESS = 18
-    UP_RELEASE = 19
-    UP_TAP = 20
-    DOWN_PRESS = 21
-    DOWN_RELEASE = 22
-    DOWN_TAP = 23
-    LEFT_PRESS = 24
-    LEFT_RELEASE = 25
-    LEFT_TAP = 26
-    RIGHT_PRESS = 27
-    RIGHT_RELEASE = 28
-    RIGHT_TAP = 29
-    ANGLES_ENABLED = 30
-    ANGLES_DISABLED = 31
+    JUMP_PRESS = 'JUMP_PRESS'
+    JUMP_RELEASE = 'JUMP_RELEASE'
+    ATTACK_PRESS = 'ATTACK_PRESS'
+    ATTACK_RELEASE = 'ATTACK_RELEASE'
+    SPECIAL_PRESS = 'SPECIAL_PRESS'
+    SPECIAL_RELEASE = 'SPECIAL_RELEASE'
+    STRONG_PRESS = 'STRONG_PRESS'
+    STRONG_RELEASE = 'STRONG_RELEASE'
+    STRONG_LEFT_PRESS = 'STRONG_LEFT_PRESS'
+    STRONG_LEFT_RELEASE = 'STRONG_LEFT_RELEASE'
+    STRONG_RIGHT_PRESS = 'STRONG_RIGHT_PRESS'
+    STRONG_RIGHT_RELEASE = 'STRONG_RIGHT_RELEASE'
+    STRONG_UP_PRESS = 'STRONG_UP_PRESS'
+    STRONG_UP_RELEASE = 'STRONG_UP_RELEASE'
+    STRONG_DOWN_PRESS = 'STRONG_DOWN_PRESS'
+    STRONG_DOWN_RELEASE = 'STRONG_DOWN_RELEASE'
+    DODGE_PRESS = 'DODGE_PRESS'
+    DODGE_RELEASE = 'DODGE_RELEASE'
+    UP_PRESS = 'UP_PRESS'
+    UP_RELEASE = 'UP_RELEASE'
+    UP_TAP = 'UP_TAP'
+    DOWN_PRESS = 'DOWN_PRESS'
+    DOWN_RELEASE = 'DOWN_RELEASE'
+    DOWN_TAP = 'DOWN_TAP'
+    LEFT_PRESS = 'LEFT_PRESS'
+    LEFT_RELEASE = 'LEFT_RELEASE'
+    LEFT_TAP = 'LEFT_TAP'
+    RIGHT_PRESS = 'RIGHT_PRESS'
+    RIGHT_RELEASE = 'RIGHT_RELEASE'
+    RIGHT_TAP = 'RIGHT_TAP'
+    ANGLES_ENABLED = 'ANGLES_ENABLED'
+    ANGLES_DISABLED = 'ANGLES_DISABLED'
+
+    from_token = {
+        'J': JUMP_PRESS,
+        'j': JUMP_RELEASE,
+        'A': ATTACK_PRESS,
+        'a': ATTACK_RELEASE,
+        'B': SPECIAL_PRESS,
+        'b': SPECIAL_RELEASE,
+        'C': STRONG_PRESS,
+        'c': STRONG_RELEASE,
+        'F': STRONG_LEFT_PRESS,
+        'f': STRONG_LEFT_RELEASE,
+        'G': STRONG_RIGHT_PRESS,
+        'g': STRONG_RIGHT_RELEASE,
+        'X': STRONG_UP_PRESS,
+        'x': STRONG_UP_RELEASE,
+        'W': STRONG_DOWN_PRESS,
+        'w': STRONG_DOWN_RELEASE,
+        'S': DODGE_PRESS,
+        's': DODGE_RELEASE,
+        'U': UP_PRESS,
+        'u': UP_RELEASE,
+        'M': UP_TAP,
+        'P': UP_TAP,
+        'D': DOWN_PRESS,
+        'd': DOWN_RELEASE,
+        'O': DOWN_TAP,
+        'L': LEFT_PRESS,
+        'l': LEFT_RELEASE,
+        'E': LEFT_TAP,
+        'R': RIGHT_PRESS,
+        'r': RIGHT_RELEASE,
+        'I': RIGHT_TAP,
+        'Z': ANGLES_ENABLED,
+        'z': ANGLES_DISABLED
+    }
+
+    to_boolean = {
+        JUMP_PRESS: True,
+        JUMP_RELEASE: False,
+        ATTACK_PRESS: True,
+        ATTACK_RELEASE: False,
+        SPECIAL_PRESS: True,
+        SPECIAL_RELEASE: False,
+        STRONG_PRESS: True,
+        STRONG_RELEASE: False,
+        STRONG_LEFT_PRESS: True,
+        STRONG_LEFT_RELEASE: False,
+        STRONG_RIGHT_PRESS: True,
+        STRONG_RIGHT_RELEASE: False,
+        STRONG_UP_PRESS: True,
+        STRONG_UP_RELEASE: False,
+        STRONG_DOWN_PRESS: True,
+        STRONG_DOWN_RELEASE: False,
+        DODGE_PRESS: True,
+        DODGE_RELEASE: False,
+        UP_PRESS: True,
+        UP_RELEASE: False,
+        UP_TAP: True,
+        DOWN_PRESS: True,
+        DOWN_RELEASE: False,
+        DOWN_TAP: True,
+        LEFT_PRESS: True,
+        LEFT_RELEASE: False,
+        LEFT_TAP: True,
+        RIGHT_PRESS: True,
+        RIGHT_RELEASE: False,
+        RIGHT_TAP: True,
+        ANGLES_ENABLED: True,
+        ANGLES_DISABLED: False
+    }
 
 
-class ActionType(enum.IntEnum):
-    
-    INVALID = -1
-    JUMP = 0
-    ATTACK = 1
-    SPECIAL = 2
-    STRONG = 3
-    STRONG_LEFT = 4
-    STRONG_RIGHT = 5
-    STRONG_UP = 6
-    STRONG_DOWN = 7
-    DODGE = 8
-    UP = 9
-    DOWN = 10
-    LEFT = 11
-    RIGHT = 12
-    ANGLES_ENABLED = 13
-    ANGLE_UP = 14
-    ANGLE_DOWN = 15
-    ANGLE_LEFT = 16
-    ANGLE_RIGHT = 17
-    TAP_UP = 18
-    TAP_DOWN = 19
-    TAP_LEFT = 20
-    TAP_RIGHT = 21
-    ANGLE = 22
+class StateKey:
+
+    INDEX = "Index"
+    JUMP = "Jump"
+    ATTACK = "Attack"
+    SPECIAL = "Special"
+    STRONG = "Strong"
+    STRONG_UP = "Strong Up"
+    STRONG_DOWN = "Strong Down"
+    STRONG_LEFT = "Strong Left"
+    STRONG_RIGHT = "Strong Right"
+    DODGE = "Dodge"
+    UP = "Up"
+    DOWN = "Down"
+    LEFT = "Left"
+    RIGHT = "Right"
+    TAP_UP = "Tap Up"
+    TAP_DOWN = "Tap Down"
+    TAP_LEFT = "Tap Left"
+    TAP_RIGHT = "Tap Right"
+    ANGLES_ENABLED = "Angles Enabled"
+    ANGLE = "Angle"
+
+    from_action = {
+        Action.JUMP_PRESS: JUMP,
+        Action.JUMP_RELEASE: JUMP,
+        Action.ATTACK_PRESS: ATTACK,
+        Action.ATTACK_RELEASE: ATTACK,
+        Action.SPECIAL_PRESS: SPECIAL,
+        Action.SPECIAL_RELEASE: SPECIAL,
+        Action.STRONG_PRESS: STRONG,
+        Action.STRONG_RELEASE: STRONG,
+        Action.STRONG_LEFT_PRESS: STRONG_LEFT,
+        Action.STRONG_LEFT_RELEASE: STRONG_LEFT,
+        Action.STRONG_RIGHT_PRESS: STRONG_RIGHT,
+        Action.STRONG_RIGHT_RELEASE: STRONG_RIGHT,
+        Action.STRONG_UP_PRESS: STRONG_UP,
+        Action.STRONG_UP_RELEASE: STRONG_UP,
+        Action.STRONG_DOWN_PRESS: STRONG_DOWN,
+        Action.STRONG_DOWN_RELEASE: STRONG_DOWN,
+        Action.DODGE_PRESS: DODGE,
+        Action.DODGE_RELEASE: DODGE,
+        Action.UP_PRESS: UP,
+        Action.UP_RELEASE: UP,
+        Action.UP_TAP: UP,
+        Action.UP_TAP: UP,
+        Action.DOWN_PRESS: DOWN,
+        Action.DOWN_RELEASE: DOWN,
+        Action.DOWN_TAP: DOWN,
+        Action.LEFT_PRESS: LEFT,
+        Action.LEFT_RELEASE: LEFT,
+        Action.LEFT_TAP: LEFT,
+        Action.RIGHT_PRESS: RIGHT,
+        Action.RIGHT_RELEASE: RIGHT,
+        Action.RIGHT_TAP: RIGHT,
+        Action.ANGLES_ENABLED: ANGLES_ENABLED,
+        Action.ANGLES_DISABLED: ANGLES_ENABLED,
+    }
 
 
 class FrameData:
     
     action_regex = r'(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})'
     action_pattern = re.compile(action_regex)
-    token_to_action = {
-        'J': Action.JUMP_PRESS,
-        'j': Action.JUMP_RELEASE,
-        'A': Action.ATTACK_PRESS,
-        'a': Action.ATTACK_RELEASE,
-        'B': Action.SPECIAL_PRESS,
-        'b': Action.SPECIAL_RELEASE,
-        'C': Action.STRONG_PRESS,
-        'c': Action.STRONG_RELEASE,
-        'F': Action.STRONG_LEFT_PRESS,
-        'f': Action.STRONG_LEFT_RELEASE,
-        'G': Action.STRONG_RIGHT_PRESS,
-        'g': Action.STRONG_RIGHT_RELEASE,
-        'X': Action.STRONG_UP_PRESS,
-        'x': Action.STRONG_UP_RELEASE,
-        'W': Action.STRONG_DOWN_PRESS,
-        'w': Action.STRONG_DOWN_RELEASE,
-        'S': Action.DODGE_PRESS,
-        's': Action.DODGE_RELEASE,
-        'U': Action.UP_PRESS,
-        'u': Action.UP_RELEASE,
-        'M': Action.UP_TAP,
-        'P': Action.UP_TAP,
-        'D': Action.DOWN_PRESS,
-        'd': Action.DOWN_RELEASE,
-        'O': Action.DOWN_TAP,
-        'L': Action.LEFT_PRESS,
-        'l': Action.LEFT_RELEASE,
-        'E': Action.LEFT_TAP,
-        'R': Action.RIGHT_PRESS,
-        'r': Action.RIGHT_RELEASE,
-        'I': Action.RIGHT_TAP,
-        'Z': Action.ANGLES_ENABLED,
-        'z': Action.ANGLES_DISABLED
-    }
-    action_to_boolean = {
-        Action.JUMP_PRESS: True,
-        Action.JUMP_RELEASE: False,
-        Action.ATTACK_PRESS: True,
-        Action.ATTACK_RELEASE: False,
-        Action.SPECIAL_PRESS: True,
-        Action.SPECIAL_RELEASE: False,
-        Action.STRONG_PRESS: True,
-        Action.STRONG_RELEASE: False,
-        Action.STRONG_LEFT_PRESS: True,
-        Action.STRONG_LEFT_RELEASE: False,
-        Action.STRONG_RIGHT_PRESS: True,
-        Action.STRONG_RIGHT_RELEASE: False,
-        Action.STRONG_UP_PRESS: True,
-        Action.STRONG_UP_RELEASE: False,
-        Action.STRONG_DOWN_PRESS: True,
-        Action.STRONG_DOWN_RELEASE: False,
-        Action.DODGE_PRESS: True,
-        Action.DODGE_RELEASE: False,
-        Action.UP_PRESS: True,
-        Action.UP_RELEASE: False,
-        Action.UP_TAP: True,
-        Action.DOWN_PRESS: True,
-        Action.DOWN_RELEASE: False,
-        Action.DOWN_TAP: True,
-        Action.LEFT_PRESS: True,
-        Action.LEFT_RELEASE: False,
-        Action.LEFT_TAP: True,
-        Action.RIGHT_PRESS: True,
-        Action.RIGHT_RELEASE: False,
-        Action.RIGHT_TAP: True,
-        Action.ANGLES_ENABLED: True,
-        Action.ANGLES_DISABLED: False
-    }
-    action_to_action_type = {
-        Action.JUMP_PRESS: ActionType.JUMP,
-        Action.JUMP_RELEASE: ActionType.JUMP,
-        Action.ATTACK_PRESS: ActionType.ATTACK,
-        Action.ATTACK_RELEASE: ActionType.ATTACK,
-        Action.SPECIAL_PRESS: ActionType.SPECIAL,
-        Action.SPECIAL_RELEASE: ActionType.SPECIAL,
-        Action.STRONG_PRESS: ActionType.STRONG,
-        Action.STRONG_RELEASE: ActionType.STRONG,
-        Action.STRONG_LEFT_PRESS: ActionType.STRONG_LEFT,
-        Action.STRONG_LEFT_RELEASE: ActionType.STRONG_LEFT,
-        Action.STRONG_RIGHT_PRESS: ActionType.STRONG_RIGHT,
-        Action.STRONG_RIGHT_RELEASE: ActionType.STRONG_RIGHT,
-        Action.STRONG_UP_PRESS: ActionType.STRONG_UP,
-        Action.STRONG_UP_RELEASE: ActionType.STRONG_UP,
-        Action.STRONG_DOWN_PRESS: ActionType.STRONG_DOWN,
-        Action.STRONG_DOWN_RELEASE: ActionType.STRONG_DOWN,
-        Action.DODGE_PRESS: ActionType.DODGE,
-        Action.DODGE_RELEASE: ActionType.DODGE,
-        Action.UP_PRESS: ActionType.UP,
-        Action.UP_RELEASE: ActionType.UP,
-        Action.UP_TAP: ActionType.UP,
-        Action.UP_TAP: ActionType.UP,
-        Action.DOWN_PRESS: ActionType.DOWN,
-        Action.DOWN_RELEASE: ActionType.DOWN,
-        Action.DOWN_TAP: ActionType.DOWN,
-        Action.LEFT_PRESS: ActionType.LEFT,
-        Action.LEFT_RELEASE: ActionType.LEFT,
-        Action.LEFT_TAP: ActionType.LEFT,
-        Action.RIGHT_PRESS: ActionType.RIGHT,
-        Action.RIGHT_RELEASE: ActionType.RIGHT,
-        Action.RIGHT_TAP: ActionType.RIGHT,
-        Action.ANGLES_ENABLED: ActionType.ANGLES_ENABLED,
-        Action.ANGLES_DISABLED: ActionType.ANGLES_ENABLED,
-    }
-    angle_to_action_type = {
-        0: (ActionType.ANGLE_RIGHT,),
-        45: (ActionType.ANGLE_RIGHT, ActionType.ANGLE_UP),
-        90: (ActionType.ANGLE_UP,),
-        135: (ActionType.ANGLE_UP, ActionType.ANGLE_LEFT,),
-        180: (ActionType.ANGLE_LEFT,),
-        225: (ActionType.ANGLE_LEFT, ActionType.ANGLE_DOWN),
-        270: (ActionType.ANGLE_DOWN,),
-        315: (ActionType.ANGLE_DOWN, ActionType.ANGLE_RIGHT),
-        360: (ActionType.ANGLE_RIGHT,)
-    }
 
     @classmethod
     def _convert_token_to_action(cls, t):
         if t[0] == 'y':
             return int(t[1:])
         else:
-            return cls.token_to_action.get(t, Action.INVALID)
+            return Action.from_token[t]
     
     @classmethod
     def _convert_multiple_tokens_to_actions(cls, ts):
@@ -207,7 +194,7 @@ class FrameData:
         ]
 
     @classmethod
-    def get_action_table(cls, frame_data, raw=False):
+    def get_action_map(cls, frame_data, raw=False):
         return {
             int(x[0]): (
                 x[1:] if raw 
@@ -218,22 +205,41 @@ class FrameData:
 
     @classmethod
     def get_state_table(cls, frame_data):
-        table = {}
-        state = [False]*22 + [-1]
-        for x in cls._split_frames_into_tokens(frame_data):
-            state[ActionType.ANGLE_UP:ActionType.ANGLE] = [False]*8
-            state[ActionType.ANGLE] = -1
-            n = int(x[0])
-            tokens = x[1:]
+        table = []
+        state = {
+            StateKey.INDEX: None,
+            StateKey.JUMP: False,
+            StateKey.ATTACK: False,
+            StateKey.SPECIAL: False,
+            StateKey.STRONG: False,
+            StateKey.STRONG_LEFT: False,
+            StateKey.STRONG_RIGHT: False,
+            StateKey.STRONG_UP: False,
+            StateKey.STRONG_DOWN: False,
+            StateKey.DODGE: False,
+            StateKey.UP: False,
+            StateKey.DOWN: False,
+            StateKey.LEFT: False,
+            StateKey.RIGHT: False,
+            StateKey.TAP_UP: False,
+            StateKey.TAP_DOWN: False,
+            StateKey.TAP_LEFT: False,
+            StateKey.TAP_RIGHT: False,
+            StateKey.ANGLES_ENABLED: False,
+            StateKey.ANGLE: None
+        }
+
+        for current_frame in cls._split_frames_into_tokens(frame_data):
+            state[StateKey.ANGLE] = None
+            state[StateKey.INDEX] = int(current_frame[0])
+            tokens = current_frame[1:]
             actions = cls._convert_multiple_tokens_to_actions(tokens)
             for a in actions:
-                if isinstance(a, Action):
-                    state[cls.action_to_action_type[a]] = cls.action_to_boolean[a]
+                if isinstance(a, str):
+                    state[StateKey.from_action[a]] = Action.to_boolean[a]
                 else:
-                    for x in cls.angle_to_action_type[cls.snap_angle(a)]:
-                        state[x] = True
-                    state[ActionType.ANGLE] = a
-            table[n] = list(state)
+                    state[StateKey.ANGLE] = a
+            table.append(dict(state))
         return table
 
     @staticmethod
@@ -260,14 +266,3 @@ class FrameData:
         if result == 360:
             return 0
         return result
-
-
-class LookupTable:
-
-    def __init__(self, table):
-        self._table = table
-
-    def get(self, key, snapping=True):
-        if snapping:
-            key = FrameData.snap_frame(self._table, key)
-        return self._table[key]

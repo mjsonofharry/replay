@@ -1,7 +1,7 @@
 import enum
 import functools
 import re
-from .frame import FrameData, LookupTable
+from .frame import FrameData
 
 
 class Character(enum.Enum):
@@ -81,9 +81,9 @@ class Player:
     @property
     @functools.lru_cache(maxsize=32)
     def actions(self):
-        return LookupTable(FrameData.get_action_table(self._frame_data))
+        return FrameData.get_action_map(self._frame_data)
 
     @property
     @functools.lru_cache(maxsize=32)
     def states(self):
-        return LookupTable(FrameData.get_state_table(self._frame_data))
+        return FrameData.get_state_table(self._frame_data)
