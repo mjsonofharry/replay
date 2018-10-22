@@ -112,7 +112,7 @@ class Action:
 
 class StateKey:
 
-    INDEX = "Index"
+    FRAME = "Frame"
     JUMP = "Jump"
     ATTACK = "Attack"
     SPECIAL = "Special"
@@ -133,6 +133,7 @@ class StateKey:
     ANGLES_ENABLED = "Angles Enabled"
     ANGLE = "Angle"
 
+    # TODO: Return a tuple and remove Action.to_boolean
     from_action = {
         Action.JUMP_PRESS: JUMP,
         Action.JUMP_RELEASE: JUMP,
@@ -203,11 +204,12 @@ class FrameData:
             for x in cls._split_frames_into_tokens(frame_data)
         }
 
+    # TODO: Test this!
     @classmethod
     def get_state_table(cls, frame_data):
         table = []
         state = {
-            StateKey.INDEX: None,
+            StateKey.FRAME: None,
             StateKey.JUMP: False,
             StateKey.ATTACK: False,
             StateKey.SPECIAL: False,
@@ -231,7 +233,7 @@ class FrameData:
 
         for current_frame in cls._split_frames_into_tokens(frame_data):
             state[StateKey.ANGLE] = None
-            state[StateKey.INDEX] = int(current_frame[0])
+            state[StateKey.FRAME] = int(current_frame[0])
             tokens = current_frame[1:]
             actions = cls._convert_multiple_tokens_to_actions(tokens)
             for a in actions:
