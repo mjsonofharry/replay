@@ -173,7 +173,6 @@ class FrameData:
             for x in cls._split_frames_into_tokens(frame_data)
         }
 
-    # TODO: Test this!
     @classmethod
     def get_state_table(cls, frame_data):
         table = []
