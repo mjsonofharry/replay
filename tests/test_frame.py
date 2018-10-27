@@ -1,15 +1,15 @@
-from test_common import ReplayData, PlayerData, FrameData, Action, StateKey, SAMPLE_PLAYER_DATA
+from test_common import ReplayBuffer, PlayerBuffer, FrameData, Action, StateKey, SAMPLE_PLAYER_DATA
 import pytest
 
 
 @pytest.fixture
 def action_table():
-    return FrameData.get_action_map(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+    return FrameData.get_action_map(PlayerBuffer.get_frame_data(SAMPLE_PLAYER_DATA))
 
 
 @pytest.fixture
 def raw_action_table():
-    return FrameData.get_action_map(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
+    return FrameData.get_action_map(PlayerBuffer.get_frame_data(SAMPLE_PLAYER_DATA), raw=True)
 
 
 class TestFrameData:
@@ -30,7 +30,7 @@ class TestFrameData:
         assert FrameData._convert_multiple_tokens_to_actions(['z', 'D']) == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
 
     def test_split_frames_into_tokens(self):
-        split_frames = FrameData._split_frames_into_tokens(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+        split_frames = FrameData._split_frames_into_tokens(PlayerBuffer.get_frame_data(SAMPLE_PLAYER_DATA))
         assert split_frames[0] == ['1', 'Z']
         assert split_frames[1] == ['101', 'z', 'y327', 'R']
         assert split_frames[-2] == ['2384', 'Z', 'y180', 'd']
@@ -59,7 +59,7 @@ class TestFrameData:
         assert raw_action_table[2385] == ['y  0']
 
     def test_get_state_table(self):
-        state_p1 = FrameData.get_state_table(PlayerData.get_frame_data(SAMPLE_PLAYER_DATA))
+        state_p1 = FrameData.get_state_table(PlayerBuffer.get_frame_data(SAMPLE_PLAYER_DATA))
         state = {
             StateKey.FRAME: 1,
             StateKey.JUMP: False,

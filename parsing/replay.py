@@ -2,7 +2,7 @@ import datetime
 import enum
 import functools
 import re
-from .player import PlayerData, Player
+from .player import PlayerBuffer, Player
 
 
 class Stage(enum.IntEnum):
@@ -36,81 +36,81 @@ class StageType(enum.IntEnum):
     AETHER = 1
 
 
-class ReplayData:
+class ReplayBuffer:
 
-    player_regex = r'H.*\n.*\n'
-    player_pattern = re.compile(player_regex)
+    regex = r'H.*\n.*\n'
+    pattern = re.compile(regex)
     date_fmtstr = '%H%M%S%d%m%Y'
 
     @staticmethod
-    def is_starred(replay_data):
-        return bool(int(replay_data[0]))
+    def is_starred(buffer):
+        return bool(int(buffer[0]))
 
     @staticmethod
-    def get_version(replay_data):
+    def get_version(buffer):
         return (
-            int(replay_data[1:3]), 
-            int(replay_data[3:5]),
-            int(replay_data[5:7])
+            int(buffer[1:3]), 
+            int(buffer[3:5]),
+            int(buffer[5:7])
         )
 
     @classmethod
-    def get_date(cls, replay_data):
+    def get_date(cls, buffer):
         return datetime.datetime.strptime(
-            replay_data[7:21], cls.date_fmtstr)
+            buffer[7:21], cls.date_fmtstr)
 
     @staticmethod
-    def get_name(replay_data):
-        return replay_data[21:53].rstrip()
+    def get_name(buffer):
+        return buffer[21:53].rstrip()
 
     @staticmethod
-    def get_description(replay_data):
-        return replay_data[53:193].rstrip()
+    def get_description(buffer):
+        return buffer[53:193].rstrip()
     
     @staticmethod
-    def _get_unidentified_metadata_1(replay_data):
-        return replay_data[194:204]
+    def _get_unidentified_metadata_1(buffer):
+        return buffer[194:204]
 
     @staticmethod
-    def get_stage_type(replay_data):
-        return StageType(int(replay_data[204]))
+    def get_stage_type(buffer):
+        return StageType(int(buffer[204]))
 
     @staticmethod
-    def get_stage(replay_data):
-        return Stage(int(replay_data[205:207]))
+    def get_stage(buffer):
+        return Stage(int(buffer[205:207]))
 
     @staticmethod
-    def get_stock(replay_data):
-        return int(replay_data[207:209])
+    def get_stock(buffer):
+        return int(buffer[207:209])
 
     @staticmethod
-    def get_time(replay_data):
-        return int(replay_data[209:211])
+    def get_time(buffer):
+        return int(buffer[209:211])
 
     @staticmethod
-    def is_teams_enabled(replay_data):
-        return bool(int(replay_data[212]))
+    def is_teams_enabled(buffer):
+        return bool(int(buffer[212]))
 
     @staticmethod
-    def is_friendly_fire_enabled(replay_data):
-        return bool(int(replay_data[213]))
+    def is_friendly_fire_enabled(buffer):
+        return bool(int(buffer[213]))
 
     @staticmethod
-    def is_online(replay_data):
-        return bool(int(replay_data[214]))
+    def is_online(buffer):
+        return bool(int(buffer[214]))
 
     @staticmethod
-    def _get_unidentified_metadata_2(replay_data):
-        return int(replay_data[215:218]), int(replay_data[218:222])
+    def _get_unidentified_metadata_2(buffer):
+        return int(buffer[215:218]), int(buffer[218:222])
 
     @classmethod
-    def get_player_data(cls, replay_data):
-        return cls.player_pattern.findall(replay_data)
+    def get_player_data(cls, buffer):
+        return cls.pattern.findall(buffer)
 
     @classmethod
-    def get_all_frame_data(cls, replay_data):
+    def get_all_frame_data(cls, buffer):
         return [
-            PlayerData.get_frame_data(x) for x in cls.get_player_data(replay_data)
+            PlayerBuffer.get_frame_data(x) for x in cls.get_player_data(buffer)
         ]
 
     @staticmethod
@@ -123,13 +123,13 @@ class ReplayData:
 
 class Replay:
 
-    def __init__(self, replay_data):
-        self._replay_data = replay_data
+    def __init__(self, buffer):
+        self._buffer = buffer
 
     @property
     @functools.lru_cache(maxsize=32)
     def _player_data(self):
-        return ReplayData.get_player_data(self._replay_data)
+        return ReplayBuffer.get_player_data(self._buffer)
 
     @property
     @functools.lru_cache(maxsize=32)
@@ -148,61 +148,61 @@ class Replay:
 
     @property
     def is_starred(self):
-        return ReplayData.is_starred(self._replay_data)
+        return ReplayBuffer.is_starred(self._buffer)
 
     @property
     def version(self):
-        return ReplayData.get_version(self._replay_data)
+        return ReplayBuffer.get_version(self._buffer)
 
     @property
     def date(self):
-        return ReplayData.get_date(self._replay_data)
+        return ReplayBuffer.get_date(self._buffer)
     
     @property
     def name(self):
-        return ReplayData.get_name(self._replay_data)
+        return ReplayBuffer.get_name(self._buffer)
     
     @property
     def description(self):
-        return ReplayData.get_description(self._replay_data)
+        return ReplayBuffer.get_description(self._buffer)
     
     @property
     def _unknown_1(self):
-        return ReplayData._get_unidentified_metadata_1(self._replay_data)
+        return ReplayBuffer._get_unidentified_metadata_1(self._buffer)
 
     @property
     def stage_type(self):
-        return ReplayData.get_stage_type(self._replay_data)
+        return ReplayBuffer.get_stage_type(self._buffer)
     
     @property
     def stage(self):
-        return ReplayData.get_stage(self._replay_data)
+        return ReplayBuffer.get_stage(self._buffer)
 
     @property
     def stock(self):
-        return ReplayData.get_stock(self._replay_data)
+        return ReplayBuffer.get_stock(self._buffer)
     
     @property
     def time(self):
-        return ReplayData.get_time(self._replay_data)
+        return ReplayBuffer.get_time(self._buffer)
 
     @property
     def is_teams_enabled(self):
-        return ReplayData.is_teams_enabled(self._replay_data)
+        return ReplayBuffer.is_teams_enabled(self._buffer)
     
     @property
     def is_friendly_fire_enabled(self):
-        return ReplayData.is_friendly_fire_enabled(self._replay_data)
+        return ReplayBuffer.is_friendly_fire_enabled(self._buffer)
     
     @property
     def is_online(self):
-        return ReplayData.is_online(self._replay_data)
+        return ReplayBuffer.is_online(self._buffer)
 
     @property
     def _unknown_2(self):
-        return ReplayData._get_unidentified_metadata_2(self._replay_data)
+        return ReplayBuffer._get_unidentified_metadata_2(self._buffer)
 
     @property
     @functools.lru_cache(maxsize=32)
     def duration(self):
-        return ReplayData.get_duration([x._frame_data for x in self.players])
+        return ReplayBuffer.get_duration([x._frame_data for x in self.players])

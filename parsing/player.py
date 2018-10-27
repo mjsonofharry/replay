@@ -22,61 +22,61 @@ class Character(enum.IntEnum):
     CLAIREN = 12
 
 
-class PlayerData:
+class PlayerBuffer:
     
     frame_regex= r'(\d+[a-x|z|A-X|Z]+y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d*y[\d| ]{3}[a-x|z|A-X|Z]*)|(\d+[a-x|z|A-X|Z]+)'
     frame_pattern = re.compile(frame_regex)
 
     @staticmethod
-    def is_human(player_data):
-        return player_data[0] == 'H'
+    def is_human(buffer):
+        return buffer[0] == 'H'
 
     @staticmethod
-    def get_name(player_data):
-        return player_data[1:34].rstrip()
+    def get_name(buffer):
+        return buffer[1:34].rstrip()
 
     @staticmethod
-    def get_tag(player_data):
-        return player_data[34:39].rstrip()
+    def get_tag(buffer):
+        return buffer[34:39].rstrip()
 
     @staticmethod
-    def get_character(player_data):
-        return Character(int(player_data[39:41]))
+    def get_character(buffer):
+        return Character(int(buffer[39:41]))
 
     @classmethod
-    def get_frame_data(cls, player_data):
+    def get_frame_data(cls, buffer):
         return [
             x for x in cls.frame_pattern.split(
-                player_data.split('\n')[1].rstrip()) 
+                buffer.split('\n')[1].rstrip()) 
             if x
         ]
 
 
 class Player:
     
-    def __init__(self, player_data):
-        self._player_data = player_data
+    def __init__(self, buffer):
+        self._buffer = buffer
 
     @property
     @functools.lru_cache(maxsize=32)
     def _frame_data(self):
-        return PlayerData.get_frame_data(self._player_data)
+        return PlayerBuffer.get_frame_data(self._buffer)
 
     @property
     def is_human(self):
-        return PlayerData.is_human(self._player_data)
+        return PlayerBuffer.is_human(self._buffer)
 
     @property
     def name(self):
-        return PlayerData.get_name(self._player_data)
+        return PlayerBuffer.get_name(self._buffer)
 
     @property
     def tag(self):
-        return PlayerData.get_tag(self._player_data)
+        return PlayerBuffer.get_tag(self._buffer)
 
     @property
     def character(self):
-        return PlayerData.get_character(self._player_data)
+        return PlayerBuffer.get_character(self._buffer)
 
     @property
     @functools.lru_cache(maxsize=32)
