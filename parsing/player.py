@@ -4,7 +4,7 @@ import re
 from .frame import FrameData
 
 
-class Character(enum.Enum):
+class Character(enum.IntEnum):
     
     INVALID = -1
     ERROR_1 = 0

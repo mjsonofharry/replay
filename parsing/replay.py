@@ -5,7 +5,7 @@ import re
 from .player import PlayerData, Player
 
 
-class Stage(enum.Enum):
+class Stage(enum.IntEnum):
     
     INVALID = -1
     MENU = 0
@@ -29,7 +29,7 @@ class Stage(enum.Enum):
     SWAMPY_ESTUARY = 18
 
 
-class StageType(enum.Enum):
+class StageType(enum.IntEnum):
 
     INVALID = -1
     BASIC = 0
