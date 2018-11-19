@@ -3,8 +3,9 @@ import enum
 import re
 
 
-class Action:
+class InputEvent:
 
+    INVALID = 'INVALID'
     JUMP_PRESS = 'JUMP_PRESS'
     JUMP_RELEASE = 'JUMP_RELEASE'
     ATTACK_PRESS = 'ATTACK_PRESS'
@@ -38,7 +39,7 @@ class Action:
     ANGLES_ENABLED = 'ANGLES_ENABLED'
     ANGLES_DISABLED = 'ANGLES_DISABLED'
 
-    from_token = {
+    _token_to_input_event = {
         'J': JUMP_PRESS,
         'j': JUMP_RELEASE,
         'A': ATTACK_PRESS,
@@ -74,8 +75,15 @@ class Action:
         'z': ANGLES_DISABLED
     }
 
+    @classmethod
+    def from_token(cls, t):
+        result = cls._token_to_input_event.get(t)
+        if not result:
+            raise ValueError('Encountered unknown token: "{}"'.format(t))
+        return result
 
-class StateKey:
+
+class ActionType:
 
     FRAME = "Frame"
     JUMP = "Jump"
@@ -98,46 +106,51 @@ class StateKey:
     ANGLES_ENABLED = "Angles Enabled"
     ANGLE = "Angle"
 
-    _action_map = {
-        Action.JUMP_PRESS: (True, JUMP),
-        Action.JUMP_RELEASE: (False, JUMP),
-        Action.ATTACK_PRESS: (True, ATTACK),
-        Action.ATTACK_RELEASE: (False, ATTACK),
-        Action.SPECIAL_PRESS: (True, SPECIAL),
-        Action.SPECIAL_RELEASE: (False, SPECIAL),
-        Action.STRONG_PRESS: (True, STRONG),
-        Action.STRONG_RELEASE: (False, STRONG),
-        Action.STRONG_LEFT_PRESS: (True, STRONG_LEFT),
-        Action.STRONG_LEFT_RELEASE: (False, STRONG_LEFT),
-        Action.STRONG_RIGHT_PRESS: (True, STRONG_RIGHT),
-        Action.STRONG_RIGHT_RELEASE: (False, STRONG_RIGHT),
-        Action.STRONG_UP_PRESS: (True, STRONG_UP),
-        Action.STRONG_UP_RELEASE: (False, STRONG_UP),
-        Action.STRONG_DOWN_PRESS: (True, STRONG_DOWN),
-        Action.STRONG_DOWN_RELEASE: (False, STRONG_DOWN),
-        Action.DODGE_PRESS: (True, DODGE),
-        Action.DODGE_RELEASE: (False, DODGE),
-        Action.UP_PRESS: (True, UP),
-        Action.UP_RELEASE: (False, UP),
-        Action.UP_TAP: (True, TAP_UP),
-        Action.DOWN_PRESS: (True, DOWN),
-        Action.DOWN_RELEASE: (False, DOWN),
-        Action.DOWN_TAP: (True, TAP_DOWN),
-        Action.LEFT_PRESS: (True, LEFT),
-        Action.LEFT_RELEASE: (False, LEFT),
-        Action.LEFT_TAP: (True, TAP_LEFT),
-        Action.RIGHT_PRESS: (True, RIGHT),
-        Action.RIGHT_RELEASE: (False, RIGHT),
-        Action.RIGHT_TAP: (True, TAP_RIGHT),
-        Action.ANGLES_ENABLED: (True, ANGLES_ENABLED),
-        Action.ANGLES_DISABLED: (False, ANGLES_ENABLED)
+    _input_event_to_action_type = {
+        InputEvent.JUMP_PRESS: (True, JUMP),
+        InputEvent.JUMP_RELEASE: (False, JUMP),
+        InputEvent.ATTACK_PRESS: (True, ATTACK),
+        InputEvent.ATTACK_RELEASE: (False, ATTACK),
+        InputEvent.SPECIAL_PRESS: (True, SPECIAL),
+        InputEvent.SPECIAL_RELEASE: (False, SPECIAL),
+        InputEvent.STRONG_PRESS: (True, STRONG),
+        InputEvent.STRONG_RELEASE: (False, STRONG),
+        InputEvent.STRONG_LEFT_PRESS: (True, STRONG_LEFT),
+        InputEvent.STRONG_LEFT_RELEASE: (False, STRONG_LEFT),
+        InputEvent.STRONG_RIGHT_PRESS: (True, STRONG_RIGHT),
+        InputEvent.STRONG_RIGHT_RELEASE: (False, STRONG_RIGHT),
+        InputEvent.STRONG_UP_PRESS: (True, STRONG_UP),
+        InputEvent.STRONG_UP_RELEASE: (False, STRONG_UP),
+        InputEvent.STRONG_DOWN_PRESS: (True, STRONG_DOWN),
+        InputEvent.STRONG_DOWN_RELEASE: (False, STRONG_DOWN),
+        InputEvent.DODGE_PRESS: (True, DODGE),
+        InputEvent.DODGE_RELEASE: (False, DODGE),
+        InputEvent.UP_PRESS: (True, UP),
+        InputEvent.UP_RELEASE: (False, UP),
+        InputEvent.UP_TAP: (True, TAP_UP),
+        InputEvent.DOWN_PRESS: (True, DOWN),
+        InputEvent.DOWN_RELEASE: (False, DOWN),
+        InputEvent.DOWN_TAP: (True, TAP_DOWN),
+        InputEvent.LEFT_PRESS: (True, LEFT),
+        InputEvent.LEFT_RELEASE: (False, LEFT),
+        InputEvent.LEFT_TAP: (True, TAP_LEFT),
+        InputEvent.RIGHT_PRESS: (True, RIGHT),
+        InputEvent.RIGHT_RELEASE: (False, RIGHT),
+        InputEvent.RIGHT_TAP: (True, TAP_RIGHT),
+        InputEvent.ANGLES_ENABLED: (True, ANGLES_ENABLED),
+        InputEvent.ANGLES_DISABLED: (False, ANGLES_ENABLED)
     }
 
     @classmethod
-    def from_action(cls, a):
+    def from_input_event(cls, a):
         if isinstance(a, str):
-            return cls._action_map[a]
-        return (a, cls.ANGLE)
+            result = cls._input_event_to_action_type[a]
+            if not result:
+                raise ValueError('Unknown input event: "{}"'.format(a))
+            return result
+        if isinstance(a, int):
+            return (a, cls.ANGLE)
+        raise ValueError('Input event must be int or str but instead found {}'.format(type(a)))
 
 
 class FrameData:
@@ -150,7 +163,7 @@ class FrameData:
         if t[0] == 'y':
             return int(t[1:])
         else:
-            return Action.from_token[t]
+            return InputEvent.from_token(t)
     
     @classmethod
     def _convert_multiple_tokens_to_actions(cls, ts):
@@ -177,41 +190,41 @@ class FrameData:
     def get_state_table(cls, frame_data):
         table = []
         state = {
-            StateKey.FRAME: None,
-            StateKey.JUMP: False,
-            StateKey.ATTACK: False,
-            StateKey.SPECIAL: False,
-            StateKey.STRONG: False,
-            StateKey.STRONG_LEFT: False,
-            StateKey.STRONG_RIGHT: False,
-            StateKey.STRONG_UP: False,
-            StateKey.STRONG_DOWN: False,
-            StateKey.DODGE: False,
-            StateKey.UP: False,
-            StateKey.DOWN: False,
-            StateKey.LEFT: False,
-            StateKey.RIGHT: False,
-            StateKey.TAP_UP: False,
-            StateKey.TAP_DOWN: False,
-            StateKey.TAP_LEFT: False,
-            StateKey.TAP_RIGHT: False,
-            StateKey.ANGLES_ENABLED: False,
-            StateKey.ANGLE: None
+            ActionType.FRAME: None,
+            ActionType.JUMP: False,
+            ActionType.ATTACK: False,
+            ActionType.SPECIAL: False,
+            ActionType.STRONG: False,
+            ActionType.STRONG_LEFT: False,
+            ActionType.STRONG_RIGHT: False,
+            ActionType.STRONG_UP: False,
+            ActionType.STRONG_DOWN: False,
+            ActionType.DODGE: False,
+            ActionType.UP: False,
+            ActionType.DOWN: False,
+            ActionType.LEFT: False,
+            ActionType.RIGHT: False,
+            ActionType.TAP_UP: False,
+            ActionType.TAP_DOWN: False,
+            ActionType.TAP_LEFT: False,
+            ActionType.TAP_RIGHT: False,
+            ActionType.ANGLES_ENABLED: False,
+            ActionType.ANGLE: None
         }
 
         for current_frame in cls._split_frames_into_tokens(frame_data):
             state.update({
-                StateKey.FRAME: int(current_frame[0]),
-                StateKey.TAP_UP: False,
-                StateKey.TAP_DOWN: False,
-                StateKey.TAP_LEFT: False,
-                StateKey.TAP_RIGHT: False,
-                StateKey.ANGLE: None
+                ActionType.FRAME: int(current_frame[0]),
+                ActionType.TAP_UP: False,
+                ActionType.TAP_DOWN: False,
+                ActionType.TAP_LEFT: False,
+                ActionType.TAP_RIGHT: False,
+                ActionType.ANGLE: None
             })
             actions = cls._convert_multiple_tokens_to_actions(current_frame[1:])
             for a in actions:
-                v, sk = StateKey.from_action(a)
-                state[sk] = v
+                v, at = ActionType.from_input_event(a)
+                state[at] = v
             table.append(dict(state))
         return table
 
@@ -221,7 +234,7 @@ class FrameData:
         i = bisect.bisect_right(keys, n)
         if i:
             return keys[i-1]
-        raise ValueError
+        raise ValueError('Frame snapping failed. Do not snap negative values.')
     
     @classmethod
     def snap_multiple_frames(cls, lookup_table, ns):

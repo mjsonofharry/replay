@@ -1,4 +1,4 @@
-from test_common import ReplayBuffer, PlayerBuffer, FrameData, Action, StateKey, SAMPLE_PLAYER_DATA
+from test_common import ReplayBuffer, PlayerBuffer, FrameData, InputEvent, ActionType, SAMPLE_PLAYER_DATA
 import pytest
 
 
@@ -15,19 +15,19 @@ def raw_action_table():
 class TestFrameData:
     
     def test_convert_token_to_action(self):
-        assert FrameData._convert_token_to_action('Z') == Action.ANGLES_ENABLED
+        assert FrameData._convert_token_to_action('Z') == InputEvent.ANGLES_ENABLED
         assert FrameData._convert_token_to_action('y327') == 327
-        assert FrameData._convert_token_to_action('R') == Action.RIGHT_PRESS
+        assert FrameData._convert_token_to_action('R') == InputEvent.RIGHT_PRESS
 
     def test_convert_multiple_tokens_to_actions(self):
-        assert FrameData._convert_multiple_tokens_to_actions(['Z']) == [Action.ANGLES_ENABLED]
-        assert FrameData._convert_multiple_tokens_to_actions(['z', 'y327', 'R']) == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
-        assert FrameData._convert_multiple_tokens_to_actions(['C']) == [Action.STRONG_PRESS]
-        assert FrameData._convert_multiple_tokens_to_actions(['Z', 'y  0', 'r', 'c']) == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
-        assert FrameData._convert_multiple_tokens_to_actions(['z', 'y143', 'L', 'U']) == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['Z']) == [InputEvent.ANGLES_ENABLED]
+        assert FrameData._convert_multiple_tokens_to_actions(['z', 'y327', 'R']) == [InputEvent.ANGLES_DISABLED, 327, InputEvent.RIGHT_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['C']) == [InputEvent.STRONG_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['Z', 'y  0', 'r', 'c']) == [InputEvent.ANGLES_ENABLED, 0, InputEvent.RIGHT_RELEASE, InputEvent.STRONG_RELEASE]
+        assert FrameData._convert_multiple_tokens_to_actions(['z', 'y143', 'L', 'U']) == [InputEvent.ANGLES_DISABLED, 143, InputEvent.LEFT_PRESS, InputEvent.UP_PRESS]
         assert FrameData._convert_multiple_tokens_to_actions(['y  0']) == [0]
-        assert FrameData._convert_multiple_tokens_to_actions(['Z', 'y180', 'd']) == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
-        assert FrameData._convert_multiple_tokens_to_actions(['z', 'D']) == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
+        assert FrameData._convert_multiple_tokens_to_actions(['Z', 'y180', 'd']) == [InputEvent.ANGLES_ENABLED, 180, InputEvent.DOWN_RELEASE]
+        assert FrameData._convert_multiple_tokens_to_actions(['z', 'D']) == [InputEvent.ANGLES_DISABLED, InputEvent.DOWN_PRESS]
 
     def test_split_frames_into_tokens(self):
         split_frames = FrameData._split_frames_into_tokens(PlayerBuffer.get_frame_data(SAMPLE_PLAYER_DATA))
@@ -38,13 +38,13 @@ class TestFrameData:
 
     def test_get_action_table(self, action_table):
         assert len(action_table.keys()) == 717
-        assert action_table[1] == [Action.ANGLES_ENABLED]
-        assert action_table[101] == [Action.ANGLES_DISABLED, 327, Action.RIGHT_PRESS]
-        assert action_table[148] == [Action.STRONG_PRESS]
-        assert action_table[154] == [Action.ANGLES_ENABLED, 0, Action.RIGHT_RELEASE, Action.STRONG_RELEASE]
-        assert action_table[1293] == [Action.ANGLES_DISABLED, 143, Action.LEFT_PRESS, Action.UP_PRESS]
-        assert action_table[2366] == [Action.ANGLES_DISABLED, Action.DOWN_PRESS]
-        assert action_table[2384] == [Action.ANGLES_ENABLED, 180, Action.DOWN_RELEASE]
+        assert action_table[1] == [InputEvent.ANGLES_ENABLED]
+        assert action_table[101] == [InputEvent.ANGLES_DISABLED, 327, InputEvent.RIGHT_PRESS]
+        assert action_table[148] == [InputEvent.STRONG_PRESS]
+        assert action_table[154] == [InputEvent.ANGLES_ENABLED, 0, InputEvent.RIGHT_RELEASE, InputEvent.STRONG_RELEASE]
+        assert action_table[1293] == [InputEvent.ANGLES_DISABLED, 143, InputEvent.LEFT_PRESS, InputEvent.UP_PRESS]
+        assert action_table[2366] == [InputEvent.ANGLES_DISABLED, InputEvent.DOWN_PRESS]
+        assert action_table[2384] == [InputEvent.ANGLES_ENABLED, 180, InputEvent.DOWN_RELEASE]
         assert action_table[2385] == [0]
 
     def test_get_action_table_raw(self, raw_action_table):
@@ -61,50 +61,50 @@ class TestFrameData:
     def test_get_state_table(self):
         state_p1 = FrameData.get_state_table(PlayerBuffer.get_frame_data(SAMPLE_PLAYER_DATA))
         state = {
-            StateKey.FRAME: 1,
-            StateKey.JUMP: False,
-            StateKey.ATTACK: False,
-            StateKey.SPECIAL: False,
-            StateKey.STRONG: False,
-            StateKey.STRONG_LEFT: False,
-            StateKey.STRONG_RIGHT: False,
-            StateKey.STRONG_UP: False,
-            StateKey.STRONG_DOWN: False,
-            StateKey.DODGE: False,
-            StateKey.UP: False,
-            StateKey.DOWN: False,
-            StateKey.LEFT: False,
-            StateKey.RIGHT: False,
-            StateKey.TAP_UP: False,
-            StateKey.TAP_DOWN: False,
-            StateKey.TAP_LEFT: False,
-            StateKey.TAP_RIGHT: False,
-            StateKey.ANGLES_ENABLED: True,
-            StateKey.ANGLE: None
+            ActionType.FRAME: 1,
+            ActionType.JUMP: False,
+            ActionType.ATTACK: False,
+            ActionType.SPECIAL: False,
+            ActionType.STRONG: False,
+            ActionType.STRONG_LEFT: False,
+            ActionType.STRONG_RIGHT: False,
+            ActionType.STRONG_UP: False,
+            ActionType.STRONG_DOWN: False,
+            ActionType.DODGE: False,
+            ActionType.UP: False,
+            ActionType.DOWN: False,
+            ActionType.LEFT: False,
+            ActionType.RIGHT: False,
+            ActionType.TAP_UP: False,
+            ActionType.TAP_DOWN: False,
+            ActionType.TAP_LEFT: False,
+            ActionType.TAP_RIGHT: False,
+            ActionType.ANGLES_ENABLED: True,
+            ActionType.ANGLE: None
         }
         assert state_p1[0] == state
-        state[StateKey.FRAME] = 101
-        state[StateKey.ANGLES_ENABLED] = False
-        state[StateKey.RIGHT] = True
-        state[StateKey.ANGLE] = 327
+        state[ActionType.FRAME] = 101
+        state[ActionType.ANGLES_ENABLED] = False
+        state[ActionType.RIGHT] = True
+        state[ActionType.ANGLE] = 327
         assert state_p1[1] == state
-        state[StateKey.FRAME] = 102
-        state[StateKey.ANGLE] = 333
+        state[ActionType.FRAME] = 102
+        state[ActionType.ANGLE] = 333
         assert state_p1[2] == state
-        state[StateKey.FRAME] = 103
-        state[StateKey.ANGLE] = 338
-        state[StateKey.TAP_RIGHT] = True
+        state[ActionType.FRAME] = 103
+        state[ActionType.ANGLE] = 338
+        state[ActionType.TAP_RIGHT] = True
         assert state_p1[3] == state
-        state[StateKey.FRAME] = 104
-        state[StateKey.ANGLE] = 341
+        state[ActionType.FRAME] = 104
+        state[ActionType.ANGLE] = 341
         assert state_p1[4] == state
-        state[StateKey.FRAME] = 105
-        state[StateKey.ANGLE] = 344
-        state[StateKey.TAP_RIGHT] = False
+        state[ActionType.FRAME] = 105
+        state[ActionType.ANGLE] = 344
+        state[ActionType.TAP_RIGHT] = False
         assert state_p1[5] == state
-        state[StateKey.FRAME] = 106
-        state[StateKey.ANGLE] = 345
-        state[StateKey.TAP_RIGHT] = False
+        state[ActionType.FRAME] = 106
+        state[ActionType.ANGLE] = 345
+        state[ActionType.TAP_RIGHT] = False
         assert state_p1[6] == state
 
 

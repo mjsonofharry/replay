@@ -1,4 +1,4 @@
-from test_common import ReplayBuffer, PlayerBuffer, FrameData, Action, StateKey, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA
+from test_common import ReplayBuffer, PlayerBuffer, FrameData, InputEvent, ActionType, SAMPLE_REPLAY_DATA, SAMPLE_PLAYER_DATA
 
 
 class TestBenchmarks:
@@ -19,7 +19,7 @@ class TestBenchmarks:
         result = benchmark(FrameData.get_action_map, frame_data)
         assert isinstance(result, dict)
         assert len(result.keys()) == 717
-        assert result[1] == [Action.ANGLES_ENABLED]
+        assert result[1] == [InputEvent.ANGLES_ENABLED]
         assert result[2385] == [0]
 
     def test_get_state_table(self, benchmark):
@@ -28,6 +28,6 @@ class TestBenchmarks:
         assert isinstance(result, list)
         assert len(result) == 717
         assert isinstance(result[0], dict)
-        assert result[0][StateKey.ANGLES_ENABLED] == True
-        assert result[716][StateKey.FRAME] == 2385
-        assert result[716][StateKey.ANGLE] == 0
+        assert result[0][ActionType.ANGLES_ENABLED] == True
+        assert result[716][ActionType.FRAME] == 2385
+        assert result[716][ActionType.ANGLE] == 0
