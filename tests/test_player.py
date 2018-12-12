@@ -1,26 +1,26 @@
 import pytest
-from test_common import PlayerBuffer, Player, Character, SAMPLE_PLAYER_DATA, ALT_SAMPLE_PLAYER_DATA
+from test_common import player, SAMPLE_PLAYER_DATA, ALT_SAMPLE_PLAYER_DATA
 
 
 class TestPlayerData:
     
     def test_is_human(self):
-        assert PlayerBuffer.is_human(SAMPLE_PLAYER_DATA) == True
+        assert player.is_human(SAMPLE_PLAYER_DATA) == True
     
     def test_get_name(self):
-        assert PlayerBuffer.get_name(SAMPLE_PLAYER_DATA) == 'Player 1'
+        assert player.get_name(SAMPLE_PLAYER_DATA) == 'Player 1'
 
     def test_get_tag(self):
-        assert PlayerBuffer.get_tag(SAMPLE_PLAYER_DATA) == ''
+        assert player.get_tag(SAMPLE_PLAYER_DATA) == ''
 
     def test_get_character(self):
-        assert PlayerBuffer.get_character(SAMPLE_PLAYER_DATA) == Character.ORI
+        assert player.get_character(SAMPLE_PLAYER_DATA) == player.Character.ORI
 
     def test_get_character_alt(self):
-        assert PlayerBuffer.get_character(ALT_SAMPLE_PLAYER_DATA[1]) == Character.ABSA
+        assert player.get_character(ALT_SAMPLE_PLAYER_DATA[1]) == player.Character.ABSA
 
     def test_get_frame_data(self):
-        actions_p1 = PlayerBuffer.get_frame_data(SAMPLE_PLAYER_DATA)
+        actions_p1 = player.get_frame_data(SAMPLE_PLAYER_DATA)
         assert len(actions_p1) == 717
         assert actions_p1[0] == '1Z'
         assert actions_p1[1] == '101zy327R'
@@ -35,17 +35,17 @@ class TestPlayerData:
 class TestPlayer:
 
     @pytest.fixture
-    def player(self):
-        return Player(SAMPLE_PLAYER_DATA)
+    def p(self):
+        return player.Player(SAMPLE_PLAYER_DATA)
 
-    def test_is_human(self, player):
-        assert player.is_human == PlayerBuffer.is_human(SAMPLE_PLAYER_DATA)
+    def test_is_human(self, p):
+        assert p.is_human == player.is_human(SAMPLE_PLAYER_DATA)
     
-    def test_name(self, player):
-        assert player.name == PlayerBuffer.get_name(SAMPLE_PLAYER_DATA)
+    def test_name(self, p):
+        assert p.name == player.get_name(SAMPLE_PLAYER_DATA)
 
-    def test_tag(self, player):
-        assert player.tag == PlayerBuffer.get_tag(SAMPLE_PLAYER_DATA)
+    def test_tag(self, p):
+        assert p.tag == player.get_tag(SAMPLE_PLAYER_DATA)
 
-    def test_character(self, player):
-        assert player.character == PlayerBuffer.get_character(SAMPLE_PLAYER_DATA)
+    def test_character(self, p):
+        assert p.character == player.get_character(SAMPLE_PLAYER_DATA)

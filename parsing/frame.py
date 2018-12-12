@@ -153,102 +153,91 @@ class ActionType:
         raise ValueError('Input event must be int or str but instead found {}'.format(type(a)))
 
 
-class FrameData:
-    
-    action_regex = r'(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})'
-    action_pattern = re.compile(action_regex)
+REGEX = r'(^\d+)|([a-x|z|A-X|Z])|(y[\d| ]{3})'
+PATTERN = re.compile(REGEX)
 
-    @classmethod
-    def _convert_token_to_action(cls, t):
-        if t[0] == 'y':
-            return int(t[1:])
-        else:
-            return InputEvent.from_token(t)
-    
-    @classmethod
-    def _convert_multiple_tokens_to_actions(cls, ts):
-        return [cls._convert_token_to_action(t) for t in ts]
+def _convert_token_to_action(t):
+    if t[0] == 'y':
+        return int(t[1:])
+    else:
+        return InputEvent.from_token(t)
 
-    @classmethod
-    def _split_frames_into_tokens(cls, frame_data):
-        return [
-            [x1 for x1 in FrameData.action_pattern.split(x) if x1] 
-            for x in frame_data
-        ]
+def _convert_multiple_tokens_to_actions(ts):
+    return [_convert_token_to_action(t) for t in ts]
 
-    @classmethod
-    def get_action_map(cls, frame_data, raw=False):
-        return {
-            int(x[0]): (
-                x[1:] if raw 
-                else cls._convert_multiple_tokens_to_actions(x[1:])
-            )
-            for x in cls._split_frames_into_tokens(frame_data)
-        }
+def _split_frames_into_tokens(frame_data):
+    return [
+        [x1 for x1 in PATTERN.split(x) if x1] 
+        for x in frame_data
+    ]
 
-    @classmethod
-    def get_state_table(cls, frame_data):
-        table = []
-        state = {
-            ActionType.FRAME: None,
-            ActionType.JUMP: False,
-            ActionType.ATTACK: False,
-            ActionType.SPECIAL: False,
-            ActionType.STRONG: False,
-            ActionType.STRONG_LEFT: False,
-            ActionType.STRONG_RIGHT: False,
-            ActionType.STRONG_UP: False,
-            ActionType.STRONG_DOWN: False,
-            ActionType.DODGE: False,
-            ActionType.UP: False,
-            ActionType.DOWN: False,
-            ActionType.LEFT: False,
-            ActionType.RIGHT: False,
+def get_action_map(frame_data, raw=False):
+    return {
+        int(x[0]): (
+            x[1:] if raw 
+            else _convert_multiple_tokens_to_actions(x[1:])
+        )
+        for x in _split_frames_into_tokens(frame_data)
+    }
+
+def get_state_table(frame_data):
+    table = []
+    state = {
+        ActionType.FRAME: None,
+        ActionType.JUMP: False,
+        ActionType.ATTACK: False,
+        ActionType.SPECIAL: False,
+        ActionType.STRONG: False,
+        ActionType.STRONG_LEFT: False,
+        ActionType.STRONG_RIGHT: False,
+        ActionType.STRONG_UP: False,
+        ActionType.STRONG_DOWN: False,
+        ActionType.DODGE: False,
+        ActionType.UP: False,
+        ActionType.DOWN: False,
+        ActionType.LEFT: False,
+        ActionType.RIGHT: False,
+        ActionType.TAP_UP: False,
+        ActionType.TAP_DOWN: False,
+        ActionType.TAP_LEFT: False,
+        ActionType.TAP_RIGHT: False,
+        ActionType.ANGLES_ENABLED: False,
+        ActionType.ANGLE: None
+    }
+
+    for current_frame in _split_frames_into_tokens(frame_data):
+        state.update({
+            ActionType.FRAME: int(current_frame[0]),
             ActionType.TAP_UP: False,
             ActionType.TAP_DOWN: False,
             ActionType.TAP_LEFT: False,
             ActionType.TAP_RIGHT: False,
-            ActionType.ANGLES_ENABLED: False,
             ActionType.ANGLE: None
-        }
+        })
+        actions = _convert_multiple_tokens_to_actions(current_frame[1:])
+        for a in actions:
+            v, at = ActionType.from_input_event(a)
+            state[at] = v
+        table.append(dict(state))
+    return table
 
-        for current_frame in cls._split_frames_into_tokens(frame_data):
-            state.update({
-                ActionType.FRAME: int(current_frame[0]),
-                ActionType.TAP_UP: False,
-                ActionType.TAP_DOWN: False,
-                ActionType.TAP_LEFT: False,
-                ActionType.TAP_RIGHT: False,
-                ActionType.ANGLE: None
-            })
-            actions = cls._convert_multiple_tokens_to_actions(current_frame[1:])
-            for a in actions:
-                v, at = ActionType.from_input_event(a)
-                state[at] = v
-            table.append(dict(state))
-        return table
+def snap_frame(lookup_table, n):
+    keys = list(lookup_table.keys())
+    i = bisect.bisect_right(keys, n)
+    if i:
+        return keys[i-1]
+    raise ValueError('Frame snapping failed. Do not snap negative values.')
 
-    @staticmethod
-    def snap_frame(lookup_table, n):
-        keys = list(lookup_table.keys())
-        i = bisect.bisect_right(keys, n)
-        if i:
-            return keys[i-1]
-        raise ValueError('Frame snapping failed. Do not snap negative values.')
-    
-    @classmethod
-    def snap_multiple_frames(cls, lookup_table, ns):
-        return [cls.snap_frame(lookup_table, n) for n in ns]
+def snap_multiple_frames(lookup_table, ns):
+    return [snap_frame(lookup_table, n) for n in ns]
 
-    @classmethod
-    def get_closest_action(cls, lookup_table, n):
-        return lookup_table[cls.snap_frame(lookup_table, n)]
+def get_closest_action(lookup_table, n):
+    return lookup_table[snap_frame(lookup_table, n)]
 
-    @staticmethod
-    def snap_angle(n):
-        if n < 0 or n > 360:
-            raise ValueError
-        result = 45 * round(float(n) / 45)
-        if result == 360:
-            return 0
-        return result
+def snap_angle(n):
+    if n < 0 or n > 360:
+        raise ValueError
+    result = 45 * round(float(n) / 45)
+    if result == 360:
+        return 0
+    return result
